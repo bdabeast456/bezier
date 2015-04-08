@@ -1,9 +1,17 @@
 DESCRIPTION 'OpenGL Utility Toolkit for Win32'
+<<<<<<< HEAD
 
 VERSION 3.7
 
 EXPORTS
 
+=======
+
+VERSION 3.7
+
+EXPORTS
+
+>>>>>>> 7172a07c8a8216eb25ca71e9d946c039e17bfd56
 	glutAddMenuEntry
 	glutAddSubMenu
 	glutAttachMenu
@@ -123,4 +131,8 @@ EXPORTS
 	glutWireTorus
 ;    __glutSetFCB
 ;    __glutGetFCB
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> 7172a07c8a8216eb25ca71e9d946c039e17bfd56

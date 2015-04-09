@@ -27,7 +27,6 @@
 #include <numeric>
 #include <cstdlib>
 #include <vector>
-#include "bezier_util.h"
 
 #include "bezier_util.h"
 

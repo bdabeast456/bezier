@@ -83,7 +83,31 @@ Surface::Surface(double fi[][3], double se[][3], double th[][3], double fo[][3])
     fourth.push_back(fo[3]);
     bez4 = Bezier(fourth);
 
+}
 
+vector<double> Surface::getSurfacePoint(double u, double v){
+    /*
+    * getSurfacePoint uses the Tensor-Product algorithm to get the point 
+    * at u and v
+    */
+    vector<double> point1 = bez1.getPoint(u);
+    vector<double> point2 = bez2.getPoint(u);
+    vector<double> point3 = bez3.getPoint(u);
+    vector<double> point4 = bez4.getPoint(u);
+
+    double point1_array[3] = {point1[0],point1[1],point1[2]};
+    double point2_array[3] = {point2[0],point2[1],point2[2]};
+    double point3_array[3] = {point3[0],point3[1],point3[2]};
+    double point4_array[3] = {point4[0],point4[1],point4[2]};
+
+    vector<double*> v_patch;
+    v_patch.push_back(point1_array);
+    v_patch.push_back(point2_array);
+    v_patch.push_back(point3_array);
+    v_patch.push_back(point4_array);
+
+    Bezier v_bez = Bezier(v_patch);
+    return v_bez.getPoint(v);
 }
 
 

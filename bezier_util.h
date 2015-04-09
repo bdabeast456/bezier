@@ -6,6 +6,20 @@
 
 using namespace std;
 
+class Bezier{
+    /*
+    * Bezier is a class that holds the bezier data for a given surface. 
+    */
+    public:
+    Bezier(vector<double*> patch);
+    Bezier(){};
+    vector<double> getPoint(double u);
+    vector<double> cx;
+    vector<double> cy;
+    vector<double> cz;
+    
+};
+
 class Surface{
     /*
     * Surface is a class that holds 4 4x3 patches. The coordinates of these patches
@@ -13,12 +27,18 @@ class Surface{
     */
     public:
         Surface();
-        Surface(double fi[], double se[], double th[], double fo[]);
-        vector<double> first;
-        vector<double> second;
-        vector<double> third;
-        vector<double> fourth;
+        Surface(double fi[][3], double se[][3], double th[][3], double fo[][3]);
+        vector<double*> first;
+        Bezier bez1;
+        vector<double*> second;
+        Bezier bez2;
+        vector<double*> third;
+        Bezier bez3;
+        vector<double*> fourth;
+        Bezier bez4;
+        vector<double> getSurfacePoint(double u, double v);
 };
+
 
 class Polygon {
 	/*

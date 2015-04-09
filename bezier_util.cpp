@@ -12,34 +12,91 @@ using namespace std;
 const double PI_rad = 3.141592653589793/180;
 
 
+Bezier::Bezier(vector<double*> patch){
+   /*
+   * argument in the form of one = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}};
+   */
+   // X COMPONENT
+   cx.push_back(patch[0][0]);
+   cx.push_back(-3*patch[0][0] + 3*patch[1][0]);
+   cx.push_back(3*patch[0][0] -6*patch[1][0] + 3*patch[2][0]);
+   cx.push_back(-patch[0][0] + 3*patch[1][0] -3*patch[2][0] + patch[3][0]);
+
+   // Y COMPONENT
+   cy.push_back(patch[0][1]);
+   cy.push_back(-3*patch[0][1] + 3*patch[1][1]);
+   cy.push_back(3*patch[0][1] -6*patch[1][1] + 3*patch[2][1]);
+   cy.push_back(-patch[0][1] + 3*patch[1][1] -3*patch[2][1] + patch[3][1]);
+
+   // Z COMPONENT
+   cz.push_back(patch[0][2]);
+   cz.push_back(-3*patch[0][2] + 3*patch[1][2]);
+   cz.push_back(3*patch[0][2] -6*patch[1][2] + 3*patch[2][2]);
+   cz.push_back(-patch[0][2] + 3*patch[1][2] -3*patch[2][2] + patch[3][2]);
+
+
+}
+
+vector<double> Bezier::getPoint(double u){
+    /*
+    * returns {x,y,z} from the bezier formula with degree up to u^3
+    */
+    double x = cx[0] + cx[1]*u + cx[2]*u*u + cx[3]*u*u*u;
+    double y = cy[0] + cy[1]*u + cy[2]*u*u + cy[3]*u*u*u;
+    double z = cz[0] + cz[1]*u + cz[2]*u*u + cz[3]*u*u*u;
+    vector<double> rv;
+    rv.push_back(x);
+    rv.push_back(y);
+    rv.push_back(z);
+    return rv;
+}
+
+
 Surface::Surface(){
 }
 
-Surface::Surface(double fi[], double se[], double th[], double fo[]){
+Surface::Surface(double fi[][3], double se[][3], double th[][3], double fo[][3]){
+    /*
+    * arguments in the form of fi = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}}
+    */
     first.push_back(fi[0]);
     first.push_back(fi[1]);
     first.push_back(fi[2]);
+    first.push_back(fi[3]);
+    bez1 = Bezier(first);
     
     second.push_back(se[0]);
     second.push_back(se[1]);
     second.push_back(se[2]);
+    second.push_back(se[3]);
+    bez2 = Bezier(second);
 
     third.push_back(th[0]);
     third.push_back(th[1]);
     third.push_back(th[2]);
+    third.push_back(th[3]);
+    bez3 = Bezier(third);
 
     fourth.push_back(fo[0]);
     fourth.push_back(fo[1]);
     fourth.push_back(fo[2]);
+    fourth.push_back(fo[3]);
+    bez4 = Bezier(fourth);
+
 
 }
+
+
+
+
+
 
 Polygon::Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ident) {
 	for (int i=0; i<3; i++) {
 		v1.push_back(vx1[i]);
-		v2.push_back(vx1[i]);
-		v3.push_back(vx1[i]);
-		v4.push_back(vx1[i]);
+		v2.push_back(vx2[i]);
+		v3.push_back(vx3[i]);
+		v4.push_back(vx4[i]);
 	}
 	id = ident;
 }

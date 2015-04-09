@@ -45,7 +45,7 @@ double Vector4::dot4(Vector4 v) {
     return x*v.xc() + y*v.yc() + z*v.zc() + w*v.wc();
 }
 
-Bezier::Bezier(vector<double*> patch){
+Bezier::Bezier(double patch[][3]){
    /*
    * argument in the form of one = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}};
    */
@@ -85,17 +85,14 @@ vector<double> Bezier::getPoint(double u){
 }
 
 
-Surface::Surface(){
-}
-
 Surface::Surface(double fi[][3], double se[][3], double th[][3], double fo[][3]){
     /*
     * arguments in the form of fi = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}}
     */
-    bez1 = Bezier(first);
-    bez2 = Bezier(second);
-    bez3 = Bezier(third);
-    bez4 = Bezier(fourth);
+    bez1 = Bezier(fi);
+    bez2 = Bezier(se);
+    bez3 = Bezier(th);
+    bez4 = Bezier(fo);
 }
 
 vector<double> Surface::getSurfacePoint(double u, double v){

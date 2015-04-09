@@ -35,3 +35,39 @@ public:
 	vector<double> v4;
 	int id; 
 };
+
+class Vector4 {
+public:
+    Vector4();
+    Vector4(double px, double py, double pz, double pw);
+    double xc();
+    double yc();
+    double zc();
+    double wc();
+    double dot4(Vector4 v);
+private:
+    double x;
+    double y;
+    double z;
+    double w;
+};
+
+class matrix {
+//0: translation, 1: scale, 2: rotation
+//Warning: don't use the invmult on a matrix created by transposeInverse
+public:
+    matrix();
+	matrix(double a, double b, double c, int mtype);
+    matrix(double x1, double x2, double x3, double x4,
+           double y1, double y2, double y3, double y4,
+           double z1, double z2, double z3, double z4,
+           double w1, double w2, double w3, double w4);
+	Vector4 multiplyv(Vector4 v);
+    Vector4 invmult(Vector4 v);
+	void multiplym(matrix m);
+    matrix transposeInverse();
+    void printMatrix();
+private:
+    vector<Vector4> mtrx;
+    vector<Vector4> inv;
+};

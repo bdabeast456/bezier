@@ -1,7 +1,5 @@
 
 #include <string.h>
-#include <vector>
-#include <iostream>
 #include <fstream>
 #include <cmath>
 
@@ -29,6 +27,7 @@
 #include <numeric>
 #include <cstdlib>
 #include <vector>
+#include "bezier_util.h"
 
 #define PI 3.14159265  // Should be used from mathlib
 inline float sqr(float x) { return x*x; }

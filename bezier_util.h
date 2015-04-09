@@ -27,7 +27,7 @@ class Bezier{
     * Bezier is a class that holds the bezier data for a given surface. 
     */
     public:
-    Bezier(vector<double*> patch);
+    Bezier(double patch[][3]);
     Bezier(){};
     vector<double> getPoint(double u);
     vector<double> cx;

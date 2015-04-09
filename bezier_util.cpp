@@ -105,11 +105,11 @@ vector<double> Surface::getSurfacePoint(double u, double v){
     vector<double> point3 = bez3.getPoint(u);
     vector<double> point4 = bez4.getPoint(u);
 
-    double point1_array[3] = {point1[0],point1[1],point1[2]};
-    double point2_array[3] = {point2[0],point2[1],point2[2]};
-    double point3_array[3] = {point3[0],point3[1],point3[2]};
-    double point4_array[3] = {point4[0],point4[1],point4[2]};
-    
+    double[] point1_array[3] = {point1[0],point1[1],point1[2]};
+    double[] point2_array[3] = {point2[0],point2[1],point2[2]};
+    double[] point3_array[3] = {point3[0],point3[1],point3[2]};
+    double[] point4_array[3] = {point4[0],point4[1],point4[2]};
+
     double v_patch[4] = {point1_array, point2_array, point3_array, point4_array};
     Bezier* v_bez = new Bezier(v_patch);
     vector<double> retval = v_bez->getPoint(v);

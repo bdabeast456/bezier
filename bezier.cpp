@@ -52,8 +52,10 @@ class Viewport {
 //****************************************************
 Viewport	viewport;
 int numSurfaces;
-
-
+vector<Polygon> polygons;
+bool flatShading = false; // if false, do smooth shading. if true, do flat shading
+bool wireFrame = false; // if false, do filled. if true, do wireframe
+bool shiftDown = false; // if shiftKey down
 
 
 //****************************************************
@@ -105,7 +107,7 @@ void myDisplay() {
   glLoadIdentity();				        // make sure transformation is "zero'd"
 
   /*
-  * START DOING BEZIER STUFF HERE
+  * CALL THE FUNCTIONS THAT DO BEZIER STUFF HERE
   */
 
 
@@ -117,6 +119,28 @@ void myKey(unsigned char key, int x, int y) {
   if(key==32) {
     exit(0);
   }
+  if(key == 115){ // 's' toggle between flat and smooth
+      if(flatShading == true){
+        flatShading = false;
+      }
+      else{
+        flatShading = true;
+      }
+  }
+  if(key == 119){ // 'w' toggle between filled and wireframe
+      if(wireFrame == true){
+        wireFrame = false;
+      }
+      else{
+        wireFrame = true;
+      }
+ 
+  }
+
+}
+
+void specialKey(int key, int x, int y){
+    
 }
 
 //****************************************************
@@ -150,6 +174,7 @@ int main(int argc, char *argv[]) {
   glutDisplayFunc(myDisplay);				// function to run when its time to draw something
   glutReshapeFunc(myReshape);				// function to run when the window gets resized
   glutKeyboardFunc(myKey);
+  glutSpecialFunc(specialKey);
   glutMainLoop();							// infinite loop that will keep drawing and resizing
   // and whatever else
 

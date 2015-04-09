@@ -9,6 +9,8 @@
 #include "bezier_util.h"
 
 using namespace std;
+const double PI_rad = 3.141592653589793/180;
+
 
 Surface::Surface(){
 }
@@ -108,12 +110,11 @@ matrix::matrix(double a, double b, double c, int mtype) {
         inv.push_back(Vector4(0.0, 1.0/b, 0.0, 0.0));
         inv.push_back(Vector4(0.0, 0.0, 1.0/c, 0.0));
     } else if (mtype == 2) { //rotation
+        double length = pow(pow(a, 2) + pow(b, 2) + pow(c, 2), .5);
         double theta = pow(pow(a, 2) + pow(b, 2) + pow(c, 2), .5)*PI_rad;
-        Vector rotation = Vector(a, b, c);
-        rotation.unit();
-        double x = rotation.xc();
-        double y = rotation.yc();
-        double z = rotation.zc();
+        double x = a/length;
+        double y = b/length;
+        double z = c/length;
         mtrx.push_back(Vector4(pow(x, 2)+(pow(z, 2)+pow(y, 2))*cos(theta),
                          x*y-z*sin(theta)-x*y*cos(theta),
                          x*z+y*sin(theta)-x*z*cos(theta), 0.0));

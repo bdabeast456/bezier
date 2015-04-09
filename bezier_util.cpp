@@ -92,28 +92,9 @@ Surface::Surface(double fi[][3], double se[][3], double th[][3], double fo[][3])
     /*
     * arguments in the form of fi = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}}
     */
-    first.push_back(fi[0]);
-    first.push_back(fi[1]);
-    first.push_back(fi[2]);
-    first.push_back(fi[3]);
     bez1 = Bezier(first);
-    
-    second.push_back(se[0]);
-    second.push_back(se[1]);
-    second.push_back(se[2]);
-    second.push_back(se[3]);
     bez2 = Bezier(second);
-
-    third.push_back(th[0]);
-    third.push_back(th[1]);
-    third.push_back(th[2]);
-    third.push_back(th[3]);
     bez3 = Bezier(third);
-
-    fourth.push_back(fo[0]);
-    fourth.push_back(fo[1]);
-    fourth.push_back(fo[2]);
-    fourth.push_back(fo[3]);
     bez4 = Bezier(fourth);
 
 }
@@ -139,8 +120,10 @@ vector<double> Surface::getSurfacePoint(double u, double v){
     v_patch.push_back(point3_array);
     v_patch.push_back(point4_array);
 
-    Bezier v_bez = Bezier(v_patch);
-    return v_bez.getPoint(v);
+    Bezier* v_bez = new Bezier(v_patch);
+    vector<double> retval = v_bez->getPoint(v);
+    delete v_bez;
+    return retval;
 }
 
 

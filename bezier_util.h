@@ -42,15 +42,11 @@ class Surface{
     * are specified by the input .bez file
     */
     public:
-        Surface();
+        Surface(){};
         Surface(double fi[][3], double se[][3], double th[][3], double fo[][3]);
-        vector<double*> first;
         Bezier bez1;
-        vector<double*> second;
         Bezier bez2;
-        vector<double*> third;
         Bezier bez3;
-        vector<double*> fourth;
         Bezier bez4;
         vector<double> getSurfacePoint(double u, double v);
 };

@@ -96,7 +96,6 @@ Surface::Surface(double fi[][3], double se[][3], double th[][3], double fo[][3])
     bez2 = Bezier(second);
     bez3 = Bezier(third);
     bez4 = Bezier(fourth);
-
 }
 
 vector<double> Surface::getSurfacePoint(double u, double v){

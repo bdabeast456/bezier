@@ -30,6 +30,8 @@
 #include <cstdlib>
 #include <vector>
 
+#include "bezier_util.h"
+
 #define PI 3.14159265  // Should be used from mathlib
 inline float sqr(float x) { return x*x; }
 inline float min(float x, float y) {if (x < y) { return x;} else {return y;}}
@@ -136,11 +138,24 @@ void myKey(unsigned char key, int x, int y) {
       }
  
   }
+  if(key == 16){ // SHIFT is held down
+      shiftDown = true;
+  }
+  else{ // shift ain't held down
+      shiftDown = false;
+  }
 
 }
 
 void specialKey(int key, int x, int y){
-    
+    if(key == GLUT_KEY_UP){
+    }
+    if(key == GLUT_KEY_RIGHT){
+    }
+    if(key == GLUT_KEY_DOWN){
+    }
+    if(key == GLUT_KEY_LEFT){
+    }
 }
 
 //****************************************************

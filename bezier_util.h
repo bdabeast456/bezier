@@ -49,10 +49,10 @@ class Polygon {
 public:
 	Polygon(){};
 	Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ident);
-	vector<double> v1;
-	vector<double> v2;
-	vector<double> v3;
-	vector<double> v4;
+	Vector4 v1;
+	Vector4 v2;
+	Vector4 v3;
+	Vector4 v4;
 	int id; 
 };
 

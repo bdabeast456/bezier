@@ -113,6 +113,11 @@ void myDisplay() {
   glutSwapBuffers();					// swap buffers (we earlier set double buffer)
 }
 
+void myKey(unsigned char key, int x, int y) {
+  if(key==32) {
+    exit(0);
+  }
+}
 
 //****************************************************
 // the usual stuff, nothing exciting here

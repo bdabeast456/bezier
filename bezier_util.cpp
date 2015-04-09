@@ -11,6 +11,40 @@
 using namespace std;
 const double PI_rad = 3.141592653589793/180;
 
+Vector4::Vector4() {
+    x = 0;
+    y = 0;
+    z = 0;
+    w = 0;
+}
+
+Vector4::Vector4(double px, double py, double pz, double pw) {
+    x = px;
+    y = py;
+    z = pz;
+    w = pw;
+}
+
+double Vector4::xc() {
+    return x;
+}
+
+double Vector4::yc() {
+    return y;
+}
+
+double Vector4::zc() {
+    return z;
+}
+
+double Vector4::wc() {
+    return w;
+}
+
+double Vector4::dot4(Vector4 v) {
+    return x*v.xc() + y*v.yc() + z*v.zc() + w*v.wc();
+}
+
 Bezier::Bezier(vector<double*> patch){
    /*
    * argument in the form of one = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}};
@@ -120,40 +154,6 @@ Polygon::Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ide
 	v3 = Vector4(vx3[0], vx3[1], vx3[2], 1);
 	v4 = Vector4(vx4[0], vx4[1], vx4[2], 1);
 	id = ident;
-}
-
-Vector4::Vector4() {
-    x = 0;
-    y = 0;
-    z = 0;
-    w = 0;
-}
-
-Vector4::Vector4(double px, double py, double pz, double pw) {
-    x = px;
-    y = py;
-    z = pz;
-    w = pw;
-}
-
-double Vector4::xc() {
-    return x;
-}
-
-double Vector4::yc() {
-    return y;
-}
-
-double Vector4::zc() {
-    return z;
-}
-
-double Vector4::wc() {
-    return w;
-}
-
-double Vector4::dot4(Vector4 v) {
-    return x*v.xc() + y*v.yc() + z*v.zc() + w*v.wc();
 }
 
 matrix::matrix() {

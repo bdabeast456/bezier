@@ -6,7 +6,21 @@
 
 using namespace std;
 
-class Vector4;
+class Vector4 {
+public:
+    Vector4();
+    Vector4(double px, double py, double pz, double pw);
+    double xc();
+    double yc();
+    double zc();
+    double wc();
+    double dot4(Vector4 v);
+private:
+    double x;
+    double y;
+    double z;
+    double w;
+};
 
 class Bezier{
     /*
@@ -56,22 +70,6 @@ public:
 	Vector4 v3;
 	Vector4 v4;
 	int id; 
-};
-
-class Vector4 {
-public:
-    Vector4();
-    Vector4(double px, double py, double pz, double pw);
-    double xc();
-    double yc();
-    double zc();
-    double wc();
-    double dot4(Vector4 v);
-private:
-    double x;
-    double y;
-    double z;
-    double w;
 };
 
 class matrix {

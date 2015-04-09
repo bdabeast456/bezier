@@ -39,7 +39,7 @@ Polygon::Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ide
 		v3.push_back(vx1[i]);
 		v4.push_back(vx1[i]);
 	}
-	id = ident
+	id = ident;
 }
 
 Vector4::Vector4() {

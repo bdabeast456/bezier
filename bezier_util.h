@@ -19,3 +19,19 @@ class Surface{
         vector<double> third;
         vector<double> fourth;
 };
+
+class Polygon {
+	/*
+	*  Polygon is a container class that holds the vertices of polygon (for the sake
+	*  of this project, only 4). Each polygon also maintains an int ID to keep track 
+	*  of which file it came from.
+	*/
+public:
+	Polygon(){};
+	Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ident);
+	vector<double> v1;
+	vector<double> v2;
+	vector<double> v3;
+	vector<double> v4;
+	int id; 
+};

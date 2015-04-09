@@ -31,3 +31,13 @@ Surface::Surface(double fi[], double se[], double th[], double fo[]){
     fourth.push_back(fo[2]);
 
 }
+
+Polygon::Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ident) {
+	for (int i=0; i<3; i++) {
+		v1.push_back(vx1[i]);
+		v2.push_back(vx1[i]);
+		v3.push_back(vx1[i]);
+		v4.push_back(vx1[i]);
+	}
+	id = ident
+}

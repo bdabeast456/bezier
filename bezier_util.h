@@ -6,6 +6,8 @@
 
 using namespace std;
 
+class Vector4;
+
 class Bezier{
     /*
     * Bezier is a class that holds the bezier data for a given surface. 

@@ -11,7 +11,6 @@
 using namespace std;
 const double PI_rad = 3.141592653589793/180;
 
-
 Bezier::Bezier(vector<double*> patch){
    /*
    * argument in the form of one = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}};

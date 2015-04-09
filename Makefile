@@ -8,12 +8,9 @@ else
 	CFLAGS = -g -DGL_GLEXT_PROTOTYPES -Iglut-3.7.6-bin
 	LDFLAGS = -lglut -lGLU
 endif
-	
-RM = /bin/rm -f 
-all: main 
-main: bezier.o 
-	$(CC) $(CFLAGS) -o as3 bezier.o $(LDFLAGS) 
-bezier.o: bezier.cpp
-	$(CC) $(CFLAGS) -c bezier.cpp -o bezier.o
-clean: 
-	$(RM) *.o as3
+
+RM = /bin/rm -f	
+all: bezier.cpp bezier_util.cpp 
+	  $(CC) $(CFLAGS) -o bezier bezier.cpp bezier_util.cpp $(LDFLAGS)
+
+

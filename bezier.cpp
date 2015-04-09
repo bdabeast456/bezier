@@ -1,7 +1,5 @@
 
 #include <string.h>
-#include <vector>
-#include <iostream>
 #include <fstream>
 #include <cmath>
 
@@ -29,6 +27,7 @@
 #include <numeric>
 #include <cstdlib>
 #include <vector>
+#include "bezier_util.h"
 
 #include "bezier_util.h"
 

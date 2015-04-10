@@ -117,10 +117,6 @@ vector<double> Surface::getSurfacePoint(double u, double v){
 }
 
 
-
-
-
-
 Polygon::Polygon(vector<vector<double>> vx, int ident) {
 	for (int i=0; i<vx.size(); i++) {
 		vertices.push_back(Vector4(vx[i][0], vx[i][1], vx[i][2], 1));

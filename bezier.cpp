@@ -33,6 +33,7 @@
 #define PI 3.14159265  // Should be used from mathlib
 inline float sqr(float x) { return x*x; }
 inline float min(float x, float y) {if (x < y) { return x;} else {return y;}}
+inline double distance(vector<double> a, vector<double> b) { return pow(pow(a[0]-b[0], 2)+pow(a[1]-b[1], 2)+pow(a[2]-b[2], 2), .5);}
 
 using namespace std;
 
@@ -178,7 +179,31 @@ void specialKey(int key, int x, int y){
     }
 }
 
-void tessellate(Surface s) {
+void tessellate(Surface s, double step) {
+  for (double v=0; v<1; v+=step) {
+    for (double u=0; u<1; u+=step) {
+      vector<double> point1 = s.getSurfacePoint(u, v);
+      vector<double> point2 = s.getSurfacePoint(u+step, v);
+      vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+      vector<double> point4 = s.getSurfacePoint(u, v+step);
+      if (!tessellationStrat) {
+        vector<vector<double> > poly[4] = {point1, point2, point3, point4};
+        polygons.push_back(Polygon(poly, currID));
+      } else {
+        vector<double> actual = s.getSurfacePoint((4*u+2*step)/4, (4*v+2*step)/4);
+        vector<double> current;
+        for (int j=0; j<3; j++) {
+          current.push_back((point1[j]+point2[j]+point3[j]+point4[j])/4);
+        }
+        if (distance(current, actual) < step) {
+          vector<vector<double> > poly[4] = {point1, point2, point3, point4};
+          polygons.push_back(Polygon(poly, currID));
+        } else {
+          
+        }
+      }
+    }
+  }
   return;
 }
 

@@ -144,25 +144,34 @@ void myKey(unsigned char key, int x, int y) {
 }
 
 void specialKey(int key, int x, int y){
+    matrix m;
+    double increment = 0.1;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         //cout << "shift and up" << endl;
+        m = matrix(0,increment, 0 , 0);
     }
     else if(key == GLUT_KEY_UP){
         //cout << "up" << endl;
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
         //cout << "shift and right" << endl;
+        m = matrix(increment,0, 0 , 0);
+
     }
     else if(key == GLUT_KEY_RIGHT){
         //cout << "right" << endl;
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
+        m = matrix(0,-increment, 0 , 0);
+
     }
     else if(key == GLUT_KEY_DOWN){
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
+        m = matrix(-increment,0, 0 , 0);
+
     }
     
     else if(key == GLUT_KEY_LEFT){

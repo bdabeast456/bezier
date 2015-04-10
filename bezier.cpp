@@ -60,6 +60,8 @@ int currID = 0;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down
+double increment = 0.1;
+
 
 
 //****************************************************
@@ -119,10 +121,25 @@ void myDisplay() {
   glutSwapBuffers();					// swap buffers (we earlier set double buffer)
 }
 
+void transformPolygons(matrix m){
+    for(std::vector<Polygon>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
+        Polygon polygon = *poly;
+        vector<Vector4> newVertices;
+        for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
+            Vector4 vertex = *vert;
+            Vector4 newVertex = m.multiplyv(vertex);
+            newVertices.push_back(newVertex);
+        }
+
+    }
+
+}
+
 void myKey(unsigned char key, int x, int y) {
   if(key==32) {
     exit(0);
   }
+  
   if(key == 115){ // 's' toggle between flat and smooth
       //cout << flatShading << endl;
       if(flatShading == true){
@@ -141,43 +158,53 @@ void myKey(unsigned char key, int x, int y) {
       }
  
   }
+  matrix m;
+  if(key == 43){ // '+' zoom in
+      m = matrix(0,0,-increment,0);
+  }
+  if(key == 45){ // '-' zoom out
+      m = matrix(0,0,increment,0);
+  }
+  transformPolygons(m);
 
 }
 
 void specialKey(int key, int x, int y){
     matrix m;
-    double increment = 0.1;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         //cout << "shift and up" << endl;
         m = matrix(0,increment, 0 , 0);
     }
     else if(key == GLUT_KEY_UP){
         //cout << "up" << endl;
+        m = matrix(0,increment,0,2);
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
         //cout << "shift and right" << endl;
         m = matrix(increment,0, 0 , 0);
-
     }
     else if(key == GLUT_KEY_RIGHT){
         //cout << "right" << endl;
+        m = matrix(increment,0,0,2);
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
         m = matrix(0,-increment, 0 , 0);
-
     }
     else if(key == GLUT_KEY_DOWN){
+        m = matrix(0,-increment,0,2);
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
         m = matrix(-increment,0, 0 , 0);
-
     }
-    
     else if(key == GLUT_KEY_LEFT){
+        m = matrix(-increment,0,0,2);
     }
+    transformPolygons(m);
+    
 }
+
 
 void tessellate(Surface s, double step) {
   for (double v=0; v<1; v+=step) {

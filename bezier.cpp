@@ -153,9 +153,11 @@ void myKey(unsigned char key, int x, int y) {
   if(key == 119){ // 'w' toggle between filled and wireframe
       if(wireFrame == true){
         wireFrame = false;
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
       }
       else{
         wireFrame = true;
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
       }
  
   }

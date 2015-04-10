@@ -58,7 +58,7 @@ int tessellationStrat = 0;
 int currID = 0;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
-bool shiftDown = false; // if shiftKey down
+//bool shiftDown = false; // if shiftKey down
 
 
 //****************************************************
@@ -123,6 +123,7 @@ void myKey(unsigned char key, int x, int y) {
     exit(0);
   }
   if(key == 115){ // 's' toggle between flat and smooth
+      //cout << flatShading << endl;
       if(flatShading == true){
         flatShading = false;
       }
@@ -139,23 +140,32 @@ void myKey(unsigned char key, int x, int y) {
       }
  
   }
-  if(key == 16){ // SHIFT is held down
-      shiftDown = true;
-  }
-  else{ // shift ain't held down
-      shiftDown = false;
-  }
 
 }
 
 void specialKey(int key, int x, int y){
-    if(key == GLUT_KEY_UP){
+    if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
+        //cout << "shift and up" << endl;
     }
-    if(key == GLUT_KEY_RIGHT){
+    else if(key == GLUT_KEY_UP){
+        //cout << "up" << endl;
     }
-    if(key == GLUT_KEY_DOWN){
+    if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
+        //cout << "shift and right" << endl;
     }
-    if(key == GLUT_KEY_LEFT){
+    else if(key == GLUT_KEY_RIGHT){
+        //cout << "right" << endl;
+    }
+
+    if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
+    }
+    else if(key == GLUT_KEY_DOWN){
+    }
+
+    if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
+    }
+    
+    else if(key == GLUT_KEY_LEFT){
     }
 }
 
@@ -221,7 +231,7 @@ int main(int argc, char *argv[]) {
 
   return 0;
   }
-}
+
 
 
 

@@ -206,32 +206,7 @@ void specialKey(int key, int x, int y){
     
 }
 
-<<<<<<< HEAD
 
-void tessellate(Surface s, double step) {
-  for (double v=0; v<1; v+=step) {
-    for (double u=0; u<1; u+=step) {
-      vector<double> point1 = s.getSurfacePoint(u, v);
-      vector<double> point2 = s.getSurfacePoint(u+step, v);
-      vector<double> point3 = s.getSurfacePoint(u+step, v+step);
-      vector<double> point4 = s.getSurfacePoint(u, v+step);
-      if (!tessellationStrat) {
-        vector<vector<double> > poly[4] = {point1, point2, point3, point4};
-        polygons.push_back(Polygon(poly, currID));
-      } else {
-        vector<double> actual = s.getSurfacePoint((4*u+2*step)/4, (4*v+2*step)/4);
-        vector<double> current;
-        for (int j=0; j<3; j++) {
-          current.push_back((point1[j]+point2[j]+point3[j]+point4[j])/4);
-        }
-        if (distance(current, actual) < step) {
-          vector<vector<double> > poly[4] = {point1, point2, point3, point4};
-          polygons.push_back(Polygon(poly, currID));
-        } else {
-          
-        }
-      }
-=======
 void tessellate(Surface s, double step, double u, double v) {
   vector<double> point1 = s.getSurfacePoint(u, v);
   vector<double> point2 = s.getSurfacePoint(u+step, v);
@@ -249,7 +224,6 @@ void tessellate(Surface s, double step, double u, double v) {
     vector<double> current;
     for (int j=0; j<3; j++) {
       current.push_back((point1[j]+point2[j]+point3[j]+point4[j])/4);
->>>>>>> f3097cab1aae09a66925677233032571e0381e36
     }
     if (distance(current, actual) < step) {
       vector<vector<double> > poly;

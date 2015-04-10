@@ -74,9 +74,9 @@ vector<double> Bezier::getPoint(double u){
     /*
     * returns {x,y,z} from the bezier formula with degree up to u^3
     */
-    double x = cx[0] + cx[1]*u + cx[2]*u*u + cx[3]*u*u*u;
-    double y = cy[0] + cy[1]*u + cy[2]*u*u + cy[3]*u*u*u;
-    double z = cz[0] + cz[1]*u + cz[2]*u*u + cz[3]*u*u*u;
+    double x = cx[0] + cx[1]*u + cx[2]*pow(u, 2) + cx[3]*pow(u, 3);
+    double y = cy[0] + cy[1]*u + cy[2]*pow(u, 2) + cy[3]*pow(u, 3);
+    double z = cz[0] + cz[1]*u + cz[2]*pow(u, 2) + cz[3]*pow(u, 3);
     vector<double> rv;
     rv.push_back(x);
     rv.push_back(y);
@@ -117,7 +117,10 @@ vector<double> Surface::getSurfacePoint(double u, double v){
 }
 
 
-Polygon::Polygon(vector<vector<double>> vx, int ident) {
+Polygon::Polygon(vector<vector<double> > vx, int ident) {
+	/*
+	* Constructs a Polygon with an arbitrary number of vertices.
+	*/
 	for (int i=0; i<vx.size(); i++) {
 		vertices.push_back(Vector4(vx[i][0], vx[i][1], vx[i][2], 1));
 	}
@@ -125,6 +128,9 @@ Polygon::Polygon(vector<vector<double>> vx, int ident) {
 }
 
 matrix::matrix() {
+	/*
+	* Constructs the identity matrix.
+	*/
 	mtrx.clear();
 	inv.clear();
     mtrx.push_back(Vector4(1.0, 0.0, 0.0, 0.0));
@@ -139,6 +145,10 @@ matrix::matrix() {
 }
 
 matrix::matrix(double a, double b, double c, int mtype) {
+	/*
+	* Constructs a transformation matrix. 0 = translation,
+	* 1 = scaling, and 2 = rotation (exponential map).
+	*/
 	mtrx.clear();
 	inv.clear();
     if (mtype == 0) { // translation 
@@ -184,52 +194,8 @@ matrix::matrix(double a, double b, double c, int mtype) {
     inv.push_back(Vector4(0.0, 0.0, 0.0, 1.0));
 }
 
-matrix::matrix(double x1, double x2, double x3, double x4,
-               double y1, double y2, double y3, double y4,
-               double z1, double z2, double z3, double z4,
-               double w1, double w2, double w3, double w4) {
-	mtrx.clear();
-	inv.clear();
-    mtrx.push_back(Vector4(x1, y1, z1, w1));
-    mtrx.push_back(Vector4(x2, y2, z2, w2));
-    mtrx.push_back(Vector4(x3, y3, z3, w3));
-    mtrx.push_back(Vector4(x4, y4, z4, w4));
-
-    for (int i=0; i<4; i++) {
-        inv.push_back(Vector4());
-    }
-}
-
 Vector4 matrix::multiplyv(Vector4 v) {
     return Vector4(mtrx[0].dot4(v), mtrx[1].dot4(v), mtrx[2].dot4(v), mtrx[3].dot4(v));
-}
-
-Vector4 matrix::invmult(Vector4 v) {
-    return Vector4(inv[0].dot4(v), inv[1].dot4(v), inv[2].dot4(v), inv[3].dot4(v));
-}
-
-void matrix::multiplym(matrix m) {
-    Vector4 a = Vector4(m.mtrx[0].xc(), m.mtrx[1].xc(), m.mtrx[2].xc(), m.mtrx[3].xc());
-    Vector4 b = Vector4(m.mtrx[0].yc(), m.mtrx[1].yc(), m.mtrx[2].yc(), m.mtrx[3].yc());
-    Vector4 c = Vector4(m.mtrx[0].zc(), m.mtrx[1].zc(), m.mtrx[2].zc(), m.mtrx[3].zc());
-    Vector4 d = Vector4(m.mtrx[0].wc(), m.mtrx[1].wc(), m.mtrx[2].wc(), m.mtrx[3].wc());
-    for (int i=0; i<4; i++) {
-        mtrx[i] = Vector4(mtrx[i].dot4(a), mtrx[i].dot4(b), mtrx[i].dot4(c), mtrx[i].dot4(d));
-    }
-    a = Vector4(inv[0].xc(), inv[1].xc(), inv[2].xc(), inv[3].xc());
-    b = Vector4(inv[0].yc(), inv[1].yc(), inv[2].yc(), inv[3].yc());
-    c = Vector4(inv[0].zc(), inv[1].zc(), inv[2].zc(), inv[3].zc());
-    d = Vector4(inv[0].wc(), inv[1].wc(), inv[2].wc(), inv[3].wc());
-    for (int i=0; i<4; i++) {
-        inv[i] = Vector4(m.inv[i].dot4(a), m.inv[i].dot4(b), m.inv[i].dot4(c), m.inv[i].dot4(d));
-    }
-}
-
-matrix matrix::transposeInverse() {
-    return matrix(inv[0].xc(), inv[0].yc(), inv[0].zc(), inv[0].wc(),
-                  inv[1].xc(), inv[1].yc(), inv[1].zc(), inv[1].wc(),
-                  inv[2].xc(), inv[2].yc(), inv[2].zc(), inv[2].wc(),
-                  inv[3].xc(), inv[3].yc(), inv[3].zc(), inv[3].wc());
 }
 
 void matrix::printMatrix() {

@@ -121,11 +121,10 @@ vector<double> Surface::getSurfacePoint(double u, double v){
 
 
 
-Polygon::Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ident) {
-	v1 = Vector4(vx1[0], vx1[1], vx1[2], 1);
-	v2 = Vector4(vx2[0], vx2[1], vx2[2], 1);
-	v3 = Vector4(vx3[0], vx3[1], vx3[2], 1);
-	v4 = Vector4(vx4[0], vx4[1], vx4[2], 1);
+Polygon::Polygon(vector<double*> vx, int ident) {
+	for (int i=0; i<vx.size(); i++) {
+		vertices.push_back(Vector4(vx[i][0], vx[i][1], vx[i][2], 1));
+	}
 	id = ident;
 }
 

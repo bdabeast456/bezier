@@ -60,11 +60,8 @@ class Polygon {
 	*/
 public:
 	Polygon(){};
-	Polygon(double vx1[], double vx2[], double vx3[], double vx4[], int ident);
-	Vector4 v1;
-	Vector4 v2;
-	Vector4 v3;
-	Vector4 v4;
+	Polygon(vector<double*> vx, int ident);
+	vector<Vector4> vertices;
 	int id; 
 };
 

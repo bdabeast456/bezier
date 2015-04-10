@@ -145,9 +145,11 @@ void myKey(unsigned char key, int x, int y) {
       //cout << flatShading << endl;
       if(flatShading == true){
         flatShading = false;
+        glShadeModel(GL_SMOOTH);
       }
       else{
         flatShading = true;
+        glShadeModel(GL_FLAT);
       }
   }
   if(key == 119){ // 'w' toggle between filled and wireframe
@@ -169,7 +171,6 @@ void myKey(unsigned char key, int x, int y) {
       m = matrix(0,0,increment,0);
   }
   transformPolygons(m);
-
 }
 
 void specialKey(int key, int x, int y){

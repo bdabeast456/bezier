@@ -12,6 +12,9 @@ using namespace std;
 const double PI_rad = 3.141592653589793/180;
 
 Vector4::Vector4() {
+	/*
+	* Constructs the 0 Vector4.
+	*/
     x = 0;
     y = 0;
     z = 0;
@@ -19,6 +22,9 @@ Vector4::Vector4() {
 }
 
 Vector4::Vector4(double px, double py, double pz, double pw) {
+	/*
+	* Constructs new Vector4 with specified components.
+	*/
     x = px;
     y = py;
     z = pz;
@@ -26,22 +32,37 @@ Vector4::Vector4(double px, double py, double pz, double pw) {
 }
 
 double Vector4::xc() {
+	/*
+	* Returns x component of this Vector4.
+	*/
     return x;
 }
 
 double Vector4::yc() {
+	/*
+	* Returns y component of this Vector4.
+	*/
     return y;
 }
 
 double Vector4::zc() {
+	/*
+	* Returns z component of this Vector4.
+	*/
     return z;
 }
 
 double Vector4::wc() {
+	/*
+	* Returns w component of this Vector4.
+	*/
     return w;
 }
 
 double Vector4::dot4(Vector4 v) {
+	/*
+	* Returns the dot product of this Vector4 and v.
+	*/
     return x*v.xc() + y*v.yc() + z*v.zc() + w*v.wc();
 }
 
@@ -195,10 +216,16 @@ matrix::matrix(double a, double b, double c, int mtype) {
 }
 
 Vector4 matrix::multiplyv(Vector4 v) {
+	/*
+	* Returns a new Vector4 as the result of matrix * v.
+	*/
     return Vector4(mtrx[0].dot4(v), mtrx[1].dot4(v), mtrx[2].dot4(v), mtrx[3].dot4(v));
 }
 
 void matrix::printMatrix() {
+	/*
+	* Prints out both matrix and inverse
+	*/
 	cout << "Printing matrix" << endl;
 	for (int i=0; i<4; i++) {
 		cout << mtrx[i].xc() << " " << mtrx[i].yc() << " " << mtrx[i].zc() << " " << mtrx[i].wc() << endl;

@@ -60,7 +60,7 @@ class Polygon {
 	*/
 public:
 	Polygon(){};
-	Polygon(vector<double*> vx, int ident);
+	Polygon(vector<vector<double>> vx, int ident);
 	vector<Vector4> vertices;
 	int id; 
 };

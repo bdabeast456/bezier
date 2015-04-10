@@ -52,7 +52,10 @@ class Viewport {
 //****************************************************
 Viewport	viewport;
 int numSurfaces;
+vector<Surface> surfaces;
 vector<Polygon> polygons;
+int tessellationStrat = 0;
+int currID = 0;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 bool shiftDown = false; // if shiftKey down
@@ -156,6 +159,10 @@ void specialKey(int key, int x, int y){
     }
 }
 
+void tessellate(Surface s) {
+  return;
+}
+
 //****************************************************
 // the usual stuff, nothing exciting here
 //****************************************************
@@ -164,8 +171,29 @@ int main(int argc, char *argv[]) {
     /*
     * INSERT PARSER HERE
     */
-
+  /*if (argc == 1) {
+    cout << "No input file specified.";
+    exit(0);
+  }
+  for (int i=1; i<argc; i++) {
     
+    
+    for (int i=0; i<surfaces.size(); i++) {
+      tessellate()
+    }
+
+
+  */
+
+
+
+
+
+
+
+
+
+
   //This initializes glut
   glutInit(&argc, argv);
   //This tells glut to use a double-buffered window with red, green, and blue channels 
@@ -192,6 +220,7 @@ int main(int argc, char *argv[]) {
   // and whatever else
 
   return 0;
+  }
 }
 
 

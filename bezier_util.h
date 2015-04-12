@@ -72,6 +72,7 @@ public:
     matrix();
 	matrix(double a, double b, double c, int mtype);
 	Vector4 multiplyv(Vector4 v);
+	void multiplym(matrix m);
     void printMatrix();
 private:
     vector<Vector4> mtrx;

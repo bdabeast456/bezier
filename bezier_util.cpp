@@ -222,6 +222,27 @@ Vector4 matrix::multiplyv(Vector4 v) {
     return Vector4(mtrx[0].dot4(v), mtrx[1].dot4(v), mtrx[2].dot4(v), mtrx[3].dot4(v));
 }
 
+void matrix::multiplym(matrix m) {
+	/*
+	* Multiplies "right multiplies" this matrix by the matrix m. The result is stored in
+	* this matrix.
+	*/
+    Vector4 a = Vector4(m.mtrx[0].xc(), m.mtrx[1].xc(), m.mtrx[2].xc(), m.mtrx[3].xc());
+    Vector4 b = Vector4(m.mtrx[0].yc(), m.mtrx[1].yc(), m.mtrx[2].yc(), m.mtrx[3].yc());
+    Vector4 c = Vector4(m.mtrx[0].zc(), m.mtrx[1].zc(), m.mtrx[2].zc(), m.mtrx[3].zc());
+    Vector4 d = Vector4(m.mtrx[0].wc(), m.mtrx[1].wc(), m.mtrx[2].wc(), m.mtrx[3].wc());
+    for (int i=0; i<4; i++) {
+        mtrx[i] = Vector4(mtrx[i].dot4(a), mtrx[i].dot4(b), mtrx[i].dot4(c), mtrx[i].dot4(d));
+    }
+    a = Vector4(inv[0].xc(), inv[1].xc(), inv[2].xc(), inv[3].xc());
+    b = Vector4(inv[0].yc(), inv[1].yc(), inv[2].yc(), inv[3].yc());
+    c = Vector4(inv[0].zc(), inv[1].zc(), inv[2].zc(), inv[3].zc());
+    d = Vector4(inv[0].wc(), inv[1].wc(), inv[2].wc(), inv[3].wc());
+    for (int i=0; i<4; i++) {
+        inv[i] = Vector4(m.inv[i].dot4(a), m.inv[i].dot4(b), m.inv[i].dot4(c), m.inv[i].dot4(d));
+    }
+}
+
 void matrix::printMatrix() {
 	/*
 	* Prints out both matrix and inverse

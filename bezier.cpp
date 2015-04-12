@@ -57,7 +57,8 @@ vector<Surface> surfaces;
 vector<Polygon> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step;
+double step = .01;
+double errorBound;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down
@@ -209,40 +210,35 @@ void specialKey(int key, int x, int y){
     
 }
 
+void adaptRecurse(vector<vector<double> > test) {
 
-void tessellate(Surface s, double step, double u, double v) {
-  vector<double> point1 = s.getSurfacePoint(u, v);
-  vector<double> point2 = s.getSurfacePoint(u+step, v);
-  vector<double> point3 = s.getSurfacePoint(u+step, v+step);
-  vector<double> point4 = s.getSurfacePoint(u, v+step);
-  if (!tessellationStrat) {
-    vector<vector<double> > poly;
-    poly.push_back(point1);
-    poly.push_back(point2);
-    poly.push_back(point3);
-    poly.push_back(point4);
-    polygons.push_back(Polygon(poly, currID));
-  } else {
-    vector<double> actual = s.getSurfacePoint((4*u+2*step)/4, (4*v+2*step)/4);
-    vector<double> current;
-    for (int j=0; j<3; j++) {
-      current.push_back((point1[j]+point2[j]+point3[j]+point4[j])/4);
-    }
-    if (distance(current, actual) < step) {
+}
+
+void adaptTessellate(Surface s, double u, double v) {
+
+}
+
+void tessellate(Surface s) {
+  /*
+  * Perform uniform tessellation on Surface s. Step is specified as a global variable.
+  */
+  int steps = (int)(1/step);
+  for (int vb=0; vb<steps; vb++) {
+    double v = (double)(vb*step);
+    for (int ub=0; ub<steps; ub++) {
+      double u = (double)(ub*step);
+      vector<double> point1 = s.getSurfacePoint(u, v);
+      vector<double> point2 = s.getSurfacePoint(u+step, v);
+      vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+      vector<double> point4 = s.getSurfacePoint(u, v+step);
       vector<vector<double> > poly;
       poly.push_back(point1);
       poly.push_back(point2);
       poly.push_back(point3);
       poly.push_back(point4);
       polygons.push_back(Polygon(poly, currID));
-    } else {
-      double halfStep = step/2;
-      tessellate(s, halfStep, u, v);
-      tessellate(s, halfStep, u+halfStep, v);
-      tessellate(s, halfStep, u+halfStep, v+halfStep);
-      tessellate(s, halfStep, u, v+halfStep);
     }
-  } 
+  }
   return;
 }
 
@@ -254,19 +250,29 @@ int main(int argc, char *argv[]) {
     /*
     * INSERT PARSER HERE
     */
-  /*
+  
   if (argc == 1) {
     cout << "No input file specified.";
     exit(0);
   }
-  for (int i=1; i<argc; i++) {  
-    for (int i=0; i<surfaces.size(); i++) {
-      for (double v=0; v<1; v+=step) {
-        for (double u=0; u<1; u+=step) {
-          tessellate(surfaces[i], step, 0, 0);
+  for (int i=1; i<argc; i++) {
+    if (!tessellationStrat) {
+      for (int i=0; i<surfaces.size(); i++) {
+        tessellate(surfaces[i]);
+      }
+    } else {
+      int steps = (int)(1/step);
+      for (int i=0; i<surfaces.size(); i++) {
+        for (int vb=0; vb<steps; vb++) {
+          double v = (double)(vb*step);
+          for (int ub=0; ub<steps; ub++) {
+            double u = (double)(ub*step);
+            adaptTessellate(surfaces[i], u, v);
+          }
         }
       }
-    }*/
+    }
+  }
 
 
   

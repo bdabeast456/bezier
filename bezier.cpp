@@ -43,8 +43,8 @@ using namespace std;
 class Viewport;
 
 class Viewport {
-  public:
-    int w, h; // width and height
+    public:
+        int w, h; // width and height
 };
 
 
@@ -57,13 +57,12 @@ vector<Surface> surfaces;
 vector<Polygon> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step = .01;
-double errorBound;
+double step;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down
 double increment = 0.1;
-
+vector<double> centerPoint;
 
 
 //****************************************************
@@ -79,13 +78,13 @@ void initScene(){
 // reshape viewport if the window is resized
 //****************************************************
 void myReshape(int w, int h) {
-  viewport.w = w;
-  viewport.h = h;
+    viewport.w = w;
+    viewport.h = h;
 
-  glViewport (0,0,viewport.w,viewport.h);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0, viewport.w, 0, viewport.h);
+    glViewport (0,0,viewport.w,viewport.h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, viewport.w, 0, viewport.h);
 
 }
 
@@ -97,8 +96,8 @@ void myReshape(int w, int h) {
 //****************************************************
 
 void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
-  glColor3f(r, g, b);
-  glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
+    glColor3f(r, g, b);
+    glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
 }
 
 
@@ -109,18 +108,18 @@ void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
 //***************************************************
 void myDisplay() {
 
-  glClear(GL_COLOR_BUFFER_BIT);				// clear the color buffer
+    glClear(GL_COLOR_BUFFER_BIT);				// clear the color buffer
 
-  glMatrixMode(GL_MODELVIEW);			        // indicate we are specifying camera transformations
-  glLoadIdentity();				        // make sure transformation is "zero'd"
+    glMatrixMode(GL_MODELVIEW);			        // indicate we are specifying camera transformations
+    glLoadIdentity();				        // make sure transformation is "zero'd"
 
-  /*
-  * CALL THE FUNCTIONS THAT DO BEZIER STUFF HERE
-  */
+    /*
+     * CALL THE FUNCTIONS THAT DO BEZIER STUFF HERE
+     */
 
 
-  glFlush();
-  glutSwapBuffers();					// swap buffers (we earlier set double buffer)
+    glFlush();
+    glutSwapBuffers();					// swap buffers (we earlier set double buffer)
 }
 
 void transformPolygons(matrix m){
@@ -137,41 +136,71 @@ void transformPolygons(matrix m){
 
 }
 
+void findCenterPoint(int idCheck){
+    vector<double> center;
+    int iterationCount = 1;
+    for(std::vector<Polygon>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
+        Polygon polygon = *poly;
+        if(polygon.id == idCheck){
+            for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
+                Vector4 vertex = *vert; 
+                if(iterationCount == 1){ // first iteration
+                    center.push_back(vertex.xc());
+                    center.push_back(vertex.yc());
+                    center.push_back(vertex.zc());
+                }
+                else{
+                    center[0] = center[0] + vertex.xc();
+                    center[1] = center[1] + vertex.yc();
+                    center[2] = center[2] + vertex.zc();
+                }
+                iterationCount = iterationCount+1;
+            }
+        }
+
+    }
+    center[0] = center[0] / (polygons.size()*4); // divide by # vertices
+    center[1] = center[1] / (polygons.size()*4);
+    center[2] = center[2] / (polygons.size()*4);
+
+    centerPoint = center;
+}
+
 void myKey(unsigned char key, int x, int y) {
-  if(key==32) {
-    exit(0);
-  }
-  
-  if(key == 115){ // 's' toggle between flat and smooth
-      //cout << flatShading << endl;
-      if(flatShading == true){
-        flatShading = false;
-        glShadeModel(GL_SMOOTH);
-      }
-      else{
-        flatShading = true;
-        glShadeModel(GL_FLAT);
-      }
-  }
-  if(key == 119){ // 'w' toggle between filled and wireframe
-      if(wireFrame == true){
-        wireFrame = false;
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-      }
-      else{
-        wireFrame = true;
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-      }
- 
-  }
-  matrix m;
-  if(key == 43){ // '+' zoom in
-      m = matrix(0,0,-increment,0);
-  }
-  if(key == 45){ // '-' zoom out
-      m = matrix(0,0,increment,0);
-  }
-  transformPolygons(m);
+    if(key==32) {
+        exit(0);
+    }
+
+    if(key == 115){ // 's' toggle between flat and smooth
+        //cout << flatShading << endl;
+        if(flatShading == true){
+            flatShading = false;
+            glShadeModel(GL_SMOOTH);
+        }
+        else{
+            flatShading = true;
+            glShadeModel(GL_FLAT);
+        }
+    }
+    if(key == 119){ // 'w' toggle between filled and wireframe
+        if(wireFrame == true){
+            wireFrame = false;
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
+        else{
+            wireFrame = true;
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        }
+
+    }
+    matrix m;
+    if(key == 43){ // '+' zoom in
+        m = matrix(0,0,-increment,0);
+    }
+    if(key == 45){ // '-' zoom out
+        m = matrix(0,0,increment,0);
+    }
+    transformPolygons(m);
 }
 
 void specialKey(int key, int x, int y){
@@ -207,75 +236,67 @@ void specialKey(int key, int x, int y){
         m = matrix(-increment,0,0,2);
     }
     transformPolygons(m);
-    
-}
-
-void adaptRecurse(vector<vector<double> > test) {
 
 }
 
-void adaptTessellate(Surface s, double u, double v) {
 
-}
-
-void tessellate(Surface s) {
-  /*
-  * Perform uniform tessellation on Surface s. Step is specified as a global variable.
-  */
-  int steps = (int)(1/step);
-  for (int vb=0; vb<steps; vb++) {
-    double v = (double)(vb*step);
-    for (int ub=0; ub<steps; ub++) {
-      double u = (double)(ub*step);
-      vector<double> point1 = s.getSurfacePoint(u, v);
-      vector<double> point2 = s.getSurfacePoint(u+step, v);
-      vector<double> point3 = s.getSurfacePoint(u+step, v+step);
-      vector<double> point4 = s.getSurfacePoint(u, v+step);
-      vector<vector<double> > poly;
-      poly.push_back(point1);
-      poly.push_back(point2);
-      poly.push_back(point3);
-      poly.push_back(point4);
-      polygons.push_back(Polygon(poly, currID));
-    }
-  }
-  return;
+void tessellate(Surface s, double step, double u, double v) {
+    vector<double> point1 = s.getSurfacePoint(u, v);
+    vector<double> point2 = s.getSurfacePoint(u+step, v);
+    vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+    vector<double> point4 = s.getSurfacePoint(u, v+step);
+    if (!tessellationStrat) {
+        vector<vector<double> > poly;
+        poly.push_back(point1);
+        poly.push_back(point2);
+        poly.push_back(point3);
+        poly.push_back(point4);
+        polygons.push_back(Polygon(poly, currID));
+    } else {
+        vector<double> actual = s.getSurfacePoint((4*u+2*step)/4, (4*v+2*step)/4);
+        vector<double> current;
+        for (int j=0; j<3; j++) {
+            current.push_back((point1[j]+point2[j]+point3[j]+point4[j])/4);
+        }
+        if (distance(current, actual) < step) {
+            vector<vector<double> > poly;
+            poly.push_back(point1);
+            poly.push_back(point2);
+            poly.push_back(point3);
+            poly.push_back(point4);
+            polygons.push_back(Polygon(poly, currID));
+        } else {
+            double halfStep = step/2;
+            tessellate(s, halfStep, u, v);
+            tessellate(s, halfStep, u+halfStep, v);
+            tessellate(s, halfStep, u+halfStep, v+halfStep);
+            tessellate(s, halfStep, u, v+halfStep);
+        }
+    } 
+    return;
 }
 
 //****************************************************
 // the usual stuff, nothing exciting here
 //****************************************************
 int main(int argc, char *argv[]) {
-  
+
     /*
-    * INSERT PARSER HERE
-    */
-  
-  if (argc == 1) {
-    cout << "No input file specified.";
-    exit(0);
-  }
-  for (int i=1; i<argc; i++) {
-    if (!tessellationStrat) {
-      for (int i=0; i<surfaces.size(); i++) {
-        tessellate(surfaces[i]);
-      }
-    } else {
-      int steps = (int)(1/step);
-      for (int i=0; i<surfaces.size(); i++) {
-        for (int vb=0; vb<steps; vb++) {
-          double v = (double)(vb*step);
-          for (int ub=0; ub<steps; ub++) {
-            double u = (double)(ub*step);
-            adaptTessellate(surfaces[i], u, v);
-          }
-        }
-      }
-    }
-  }
-
-
-  
+     * INSERT PARSER HERE
+     */
+    /*
+       if (argc == 1) {
+       cout << "No input file specified.";
+       exit(0);
+       }
+       for (int i=1; i<argc; i++) {  
+       for (int i=0; i<surfaces.size(); i++) {
+       for (double v=0; v<1; v+=step) {
+       for (double u=0; u<1; u+=step) {
+       tessellate(surfaces[i], step, 0, 0);
+       }
+       }
+       }*/
 
 
 
@@ -286,33 +307,36 @@ int main(int argc, char *argv[]) {
 
 
 
-  //This initializes glut
-  glutInit(&argc, argv);
-  //This tells glut to use a double-buffered window with red, green, and blue channels 
-  std::cout << "Have " << argc << " arguments:" << std::endl;
 
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
-  // Initalize theviewport size
-  viewport.w = 400;
-  viewport.h = 400;
 
-  //The size and position of the window
-  glutInitWindowSize(viewport.w, viewport.h);
-  glutInitWindowPosition(0,0);
-  glutCreateWindow(argv[0]);
+    //This initializes glut
+    glutInit(&argc, argv);
+    //This tells glut to use a double-buffered window with red, green, and blue channels 
+    std::cout << "Have " << argc << " arguments:" << std::endl;
 
-  initScene();							// quick function to set up scene
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
-  glutDisplayFunc(myDisplay);				// function to run when its time to draw something
-  glutReshapeFunc(myReshape);				// function to run when the window gets resized
-  glutKeyboardFunc(myKey);
-  glutSpecialFunc(specialKey);
-  glutMainLoop();							// infinite loop that will keep drawing and resizing
-  // and whatever else
+    // Initalize theviewport size
+    viewport.w = 400;
+    viewport.h = 400;
 
-  return 0;
-  }
+    //The size and position of the window
+    glutInitWindowSize(viewport.w, viewport.h);
+    glutInitWindowPosition(0,0);
+    glutCreateWindow(argv[0]);
+
+    initScene();							// quick function to set up scene
+
+    glutDisplayFunc(myDisplay);				// function to run when its time to draw something
+    glutReshapeFunc(myReshape);				// function to run when the window gets resized
+    glutKeyboardFunc(myKey);
+    glutSpecialFunc(specialKey);
+    glutMainLoop();							// infinite loop that will keep drawing and resizing
+    // and whatever else
+
+    return 0;
+}
 
 
 

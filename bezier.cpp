@@ -33,8 +33,8 @@
 #define PI 3.14159265  // Should be used from mathlib
 inline float sqr(float x) { return x*x; }
 inline float min(float x, float y) {if (x < y) { return x;} else {return y;}}
-inline double distance(vector<double> a, vector<double> b) { return pow(pow(a[0]-b[0], 2)+pow(a[1]-b[1], 2)+pow(a[2]-b[2], 2), .5);}
-
+inline bool distance(double x1, double y1, double z1, vector<double> coords) {if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2]), 2)) 
+                                                                                          { return true;} else { return false}}
 using namespace std;
 
 //****************************************************
@@ -51,7 +51,7 @@ class Viewport {
 //****************************************************
 // Global Variables
 //****************************************************
-Viewport	viewport;
+Viewport    viewport;
 int numSurfaces;
 vector<Surface> surfaces;
 vector<Polygon*> polygons;
@@ -108,10 +108,10 @@ void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
 //***************************************************
 void myDisplay() {
 
-    glClear(GL_COLOR_BUFFER_BIT);				// clear the color buffer
+    glClear(GL_COLOR_BUFFER_BIT);               // clear the color buffer
 
-    glMatrixMode(GL_MODELVIEW);			        // indicate we are specifying camera transformations
-    glLoadIdentity();				        // make sure transformation is "zero'd"
+    glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
+    glLoadIdentity();                       // make sure transformation is "zero'd"
 
     /*
      * CALL THE FUNCTIONS THAT DO BEZIER STUFF HERE
@@ -119,7 +119,7 @@ void myDisplay() {
 
 
     glFlush();
-    glutSwapBuffers();					// swap buffers (we earlier set double buffer)
+    glutSwapBuffers();                  // swap buffers (we earlier set double buffer)
 }
 
 void transformPolygons(matrix m){
@@ -243,11 +243,93 @@ void specialKey(int key, int x, int y){
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
 
     }
-    transformPolygons(m);
-
+    transformPolygons(m);    
 }
 
+void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<double> > uvcoords) {
+  bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
+                     (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
+  bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
+                     (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
+  bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
+                     (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+  if (e1 && e2 && e3) {
+    Polygon * newPoly = Polygon(realcoords, currID);
+    polygons.push_back(newPoly);
+    return;
+  } else if (!e1 && e2 && e3) {
+    vector<double> newpoint1 = s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2);
+    double insert1[] = {(uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2};
+    vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
+    vector<vector<double> > trgl1;
+    vector<vector<double> > uv1;    
+    vector<vector<double> > trgl2;
+    vector<vector<double> > uv2;
+    trgl1.push_back(newpoint1);
+    trgl1.push_back(realcoords[2]);
+    trgl1.push_back(realcoords[0]);
+    uv1.push_back(newpt1);
+    uv1.push_back(uvcoords[2]);
+    uv1.push_back(uvcoords[0]);
+    trgl2.push_back(newpoint1);
+    trgl2.push_back(realcoords[1]);
+    trgl2.push_back(realcoords[2]);
+    uv2.push_back(newpt1);
+    uv2.push_back()
 
+  } else if (e1 && !e2 && e3) {
+
+  } else if (e1 && e2 && !e3) {
+
+  } else if (!e1 && !e2 && e3) {
+
+  } else if (e1 && !e2 && !e3) {
+
+  } else if (!e1 && e2 && !e3) {
+
+  } else {
+
+  }
+}
+
+void adaptTessellate(Surface s, double u, double v) {
+  vector<double> point1 = s.getSurfacePoint(u, v);
+  vector<double> pt1uv;
+  pt1uv.push_back(u);
+  pt1uv.push_back(v);
+  vector<double> point2 = s.getSurfacePoint(u+step, v);
+  vector<double> pt2uv;
+  pt2uv.push_back(u+step);
+  pt2uv.push_back(v);
+  vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+  vector<double> pt3uv;
+  pt1uv.push_back(u+step);
+  pt1uv.push_back(v+step);
+  vector<double> point4 = s.getSurfacePoint(u, v+step);
+  vector<double> pt4uv;
+  pt4uv.push_back(u);
+  pt4uv.push_back(v+step);
+  vector<vector<double> > trgl1;
+  vector<vector<double> > uv1;
+  vector<vector<double> > trgl2;
+  vector<vector<double> > uv2;
+  trgl.push_back(point1);
+  trgl.push_back(point2);
+  trgl.push_back(point3);
+  uv1.push_back(pt1uv);
+  uv1.push_back(pt2uv);
+  uv1.push_back(pt3uv);
+  trgl2.push_back(point3);
+  trgl2.push_back(point4);
+  trgl2.push_back(point1);
+  uv2.push_back(pt3uv);
+  uv2.push_back(pt4uv);
+  uv2.push_back(pt1uv);
+  adaptRecurse(s, trgl1, uv1);
+  adaptRecurse(s, trgl2, uv2);
+}
+
+<<<<<<< HEAD
 void tessellate(Surface s, double step, double u, double v) {
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> point2 = s.getSurfacePoint(u+step, v);
@@ -284,6 +366,30 @@ void tessellate(Surface s, double step, double u, double v) {
         }
     } 
     return;
+=======
+void tessellate(Surface s) {
+  /*
+  * Perform uniform tessellation on Surface s. Step is specified as a global variable.
+  */
+  int steps = (int)(1/step);
+  for (int vb=0; vb<steps; vb++) {
+    double v = (double)(vb*step);
+    for (int ub=0; ub<steps; ub++) {
+      double u = (double)(ub*step);
+      vector<double> point1 = s.getSurfacePoint(u, v);
+      vector<double> point2 = s.getSurfacePoint(u+step, v);
+      vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+      vector<double> point4 = s.getSurfacePoint(u, v+step);
+      vector<vector<double> > poly;
+      poly.push_back(point1);
+      poly.push_back(point2);
+      poly.push_back(point3);
+      poly.push_back(point4);
+      Polygon * newPoly = Polygon(poly, currID);
+      polygons.push_back(newPoly);
+    }
+  }
+>>>>>>> 7650d65af33dc35eb86e10a49970c4fb1b2fd88b
 }
 
 //****************************************************
@@ -294,19 +400,26 @@ int main(int argc, char *argv[]) {
     /*
      * INSERT PARSER HERE
      */
-    /*
-       if (argc == 1) {
+    if (argc == 1) {
        cout << "No input file specified.";
        exit(0);
-       }
-       for (int i=1; i<argc; i++) {  
-       for (int i=0; i<surfaces.size(); i++) {
-       for (double v=0; v<1; v+=step) {
-       for (double u=0; u<1; u+=step) {
-       tessellate(surfaces[i], step, 0, 0);
-       }
-       }
-       }*/
+    }
+    if (!tessellationStrat) {
+        for (int i=0; i<surfaces.size(); i++) {
+               tessellate(surfaces[i]);
+        }
+    } else {
+        int steps = (int)(1/step);
+        for (int s=0; s<surfaces.size(); i++) {
+            for (int vb=0; vb<steps; vb++) {
+                double v = (double)(ub*step);
+                for (int ub=0; ub<steps; ub++) {
+                    double u = (double)(ub*step);
+                    adaptTessellate(s, u, v);
+                }
+            }
+        }
+    }
 
 
 
@@ -336,13 +449,13 @@ int main(int argc, char *argv[]) {
     glutInitWindowPosition(0,0);
     glutCreateWindow(argv[0]);
 
-    initScene();							// quick function to set up scene
+    initScene();                            // quick function to set up scene
 
-    glutDisplayFunc(myDisplay);				// function to run when its time to draw something
-    glutReshapeFunc(myReshape);				// function to run when the window gets resized
+    glutDisplayFunc(myDisplay);             // function to run when its time to draw something
+    glutReshapeFunc(myReshape);             // function to run when the window gets resized
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
-    glutMainLoop();							// infinite loop that will keep drawing and resizing
+    glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else
 
     return 0;

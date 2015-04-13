@@ -57,7 +57,8 @@ vector<Surface> surfaces;
 vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step;
+double step = .01;
+double errorBound;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down

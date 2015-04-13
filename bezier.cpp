@@ -110,7 +110,7 @@ void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
 //***************************************************
 void myDisplay() {
 
-    glClear(GL_COLOR_BUFFER_BIT);               // clear the color buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);               // clear the color buffer
 
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
     glLoadIdentity();                       // make sure transformation is "zero'd"
@@ -639,18 +639,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     //This initializes glut
     glutInit(&argc, argv);
     //This tells glut to use a double-buffered window with red, green, and blue channels 
@@ -673,6 +661,7 @@ int main(int argc, char *argv[]) {
     glutReshapeFunc(myReshape);             // function to run when the window gets resized
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
+    glEnable(GL_DEPTH_TEST);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else
 

@@ -33,8 +33,9 @@
 #define PI 3.14159265  // Should be used from mathlib
 inline float sqr(float x) { return x*x; }
 inline float min(float x, float y) {if (x < y) { return x;} else {return y;}}
-inline bool distance(double x1, double y1, double z1, vector<double> coords) {if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2]), 2)) 
-                                                                                          { return true;} else { return false}}
+
+
+
 using namespace std;
 
 //****************************************************
@@ -121,6 +122,14 @@ void myDisplay() {
 
     glFlush();
     glutSwapBuffers();                  // swap buffers (we earlier set double buffer)
+}
+
+bool distance(double x1, double y1, double z1, vector<double> coords) {
+    if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2]), 2)) { 
+        return true;
+    } else { 
+        return false
+    }
 }
 
 void transformPolygons(matrix m){

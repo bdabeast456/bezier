@@ -125,6 +125,9 @@ void myDisplay() {
 }
 
 bool distance(double x1, double y1, double z1, vector<double> coords) {
+    /*
+    * Tells if errorBound is larger than the distance between points.
+    */
     if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2]), 2)) { 
         return true;
     } else { 
@@ -133,6 +136,9 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
 }
 
 void transformPolygons(matrix m){
+    /*
+    * Applies the transformation m to points defining tessellated polygons.
+    */
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
         vector<Vector4> newVertices;
@@ -147,6 +153,9 @@ void transformPolygons(matrix m){
 }
 
 void findCenterPoint(int idCheck){
+    /*
+    * Calculates "center" of the shape represented by an input file.
+    */
     vector<double> center;
     int iterationCount = 1;
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
@@ -177,6 +186,9 @@ void findCenterPoint(int idCheck){
 }
 
 void myKey(unsigned char key, int x, int y) {
+    /*
+    * General input key handling.
+    */
     if(key==32) {
         exit(0);
     }
@@ -226,6 +238,9 @@ void myKey(unsigned char key, int x, int y) {
 }
 
 void specialKey(int key, int x, int y){
+    /*
+    * Shift and direction key handling.
+    */
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         m = matrix(0,increment, 0 , 0);
@@ -294,110 +309,116 @@ void specialKey(int key, int x, int y){
 }
 
 void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<double> > uvcoords) {
-  bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
-                     (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
-  bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
-                     (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
-  bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
-                     (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
-  if (e1 && e2 && e3) {
-    Polygon * newPoly = Polygon(realcoords, currID);
-    polygons.push_back(newPoly);
-    return;
-  } else if (!e1 && e2 && e3) {
-    vector<double> newpoint1 = s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2);
-    double insert1[] = {(uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2};
-    vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
-    vector<vector<double> > trgl1;
-    vector<vector<double> > uv1;    
-    vector<vector<double> > trgl2;
-    vector<vector<double> > uv2;
-    trgl1.push_back(newpoint1);
-    trgl1.push_back(realcoords[2]);
-    trgl1.push_back(realcoords[0]);
-    uv1.push_back(newpt1);
-    uv1.push_back(uvcoords[2]);
-    uv1.push_back(uvcoords[0]);
-    trgl2.push_back(newpoint1);
-    trgl2.push_back(realcoords[1]);
-    trgl2.push_back(realcoords[2]);
-    uv2.push_back(newpt1);
-    uv2.push_back()
+    /*
+    * Recursive routine for adaptive tessellation.
+    */
+    bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
+                       (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
+    bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
+                       (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
+    bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
+                       (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+    if (e1 && e2 && e3) {
+        Polygon * newPoly = Polygon(realcoords, currID);
+        polygons.push_back(newPoly);
+        return;
+    } else if (!e1 && e2 && e3) {
+        vector<double> newpoint1 = s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2);
+        double insert1[] = {(uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2};
+        vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
+        vector<vector<double> > trgl1;
+        vector<vector<double> > uv1;    
+        vector<vector<double> > trgl2;
+        vector<vector<double> > uv2;
+        trgl1.push_back(newpoint1);
+        trgl1.push_back(realcoords[2]);
+        trgl1.push_back(realcoords[0]);
+        uv1.push_back(newpt1);
+        uv1.push_back(uvcoords[2]);
+        uv1.push_back(uvcoords[0]);
+        trgl2.push_back(newpoint1);
+        trgl2.push_back(realcoords[1]);
+        trgl2.push_back(realcoords[2]);
+        uv2.push_back(newpt1);
+        uv2.push_back()
 
-  } else if (e1 && !e2 && e3) {
+    } else if (e1 && !e2 && e3) {
 
-  } else if (e1 && e2 && !e3) {
+    } else if (e1 && e2 && !e3) {
 
-  } else if (!e1 && !e2 && e3) {
+    } else if (!e1 && !e2 && e3) {
 
-  } else if (e1 && !e2 && !e3) {
+    } else if (e1 && !e2 && !e3) {
 
-  } else if (!e1 && e2 && !e3) {
+    } else if (!e1 && e2 && !e3) {
 
-  } else {
+    } else {
 
-  }
+    }
 }
 
 void adaptTessellate(Surface s, double u, double v) {
-  vector<double> point1 = s.getSurfacePoint(u, v);
-  vector<double> pt1uv;
-  pt1uv.push_back(u);
-  pt1uv.push_back(v);
-  vector<double> point2 = s.getSurfacePoint(u+step, v);
-  vector<double> pt2uv;
-  pt2uv.push_back(u+step);
-  pt2uv.push_back(v);
-  vector<double> point3 = s.getSurfacePoint(u+step, v+step);
-  vector<double> pt3uv;
-  pt1uv.push_back(u+step);
-  pt1uv.push_back(v+step);
-  vector<double> point4 = s.getSurfacePoint(u, v+step);
-  vector<double> pt4uv;
-  pt4uv.push_back(u);
-  pt4uv.push_back(v+step);
-  vector<vector<double> > trgl1;
-  vector<vector<double> > uv1;
-  vector<vector<double> > trgl2;
-  vector<vector<double> > uv2;
-  trgl.push_back(point1);
-  trgl.push_back(point2);
-  trgl.push_back(point3);
-  uv1.push_back(pt1uv);
-  uv1.push_back(pt2uv);
-  uv1.push_back(pt3uv);
-  trgl2.push_back(point3);
-  trgl2.push_back(point4);
-  trgl2.push_back(point1);
-  uv2.push_back(pt3uv);
-  uv2.push_back(pt4uv);
-  uv2.push_back(pt1uv);
-  adaptRecurse(s, trgl1, uv1);
-  adaptRecurse(s, trgl2, uv2);
+    /*
+    * Starting routine for adaptive tessellation.
+    */
+    vector<double> point1 = s.getSurfacePoint(u, v);
+    vector<double> pt1uv;
+    pt1uv.push_back(u);
+    pt1uv.push_back(v);
+    vector<double> point2 = s.getSurfacePoint(u+step, v);
+    vector<double> pt2uv;
+    pt2uv.push_back(u+step);
+    pt2uv.push_back(v);
+    vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+    vector<double> pt3uv;
+    pt1uv.push_back(u+step);
+    pt1uv.push_back(v+step);
+    vector<double> point4 = s.getSurfacePoint(u, v+step);
+    vector<double> pt4uv;
+    pt4uv.push_back(u);
+    pt4uv.push_back(v+step);
+    vector<vector<double> > trgl1;
+    vector<vector<double> > uv1;
+    vector<vector<double> > trgl2;
+    vector<vector<double> > uv2;
+    trgl.push_back(point1);
+    trgl.push_back(point2);
+    trgl.push_back(point3);
+    uv1.push_back(pt1uv);
+    uv1.push_back(pt2uv);
+    uv1.push_back(pt3uv);
+    trgl2.push_back(point3);
+    trgl2.push_back(point4);
+    trgl2.push_back(point1);
+    uv2.push_back(pt3uv);
+    uv2.push_back(pt4uv);
+    uv2.push_back(pt1uv);
+    adaptRecurse(s, trgl1, uv1);
+    adaptRecurse(s, trgl2, uv2);
 }
 
 void tessellate(Surface s) {
-  /*
-  * Perform uniform tessellation on Surface s. Step is specified as a global variable.
-  */
-  int steps = (int)(1/step);
-  for (int vb=0; vb<steps; vb++) {
-    double v = (double)(vb*step);
-    for (int ub=0; ub<steps; ub++) {
-      double u = (double)(ub*step);
-      vector<double> point1 = s.getSurfacePoint(u, v);
-      vector<double> point2 = s.getSurfacePoint(u+step, v);
-      vector<double> point3 = s.getSurfacePoint(u+step, v+step);
-      vector<double> point4 = s.getSurfacePoint(u, v+step);
-      vector<vector<double> > poly;
-      poly.push_back(point1);
-      poly.push_back(point2);
-      poly.push_back(point3);
-      poly.push_back(point4);
-      Polygon * newPoly = Polygon(poly, currID);
-      polygons.push_back(newPoly);
+    /*
+    * Perform uniform tessellation on Surface s. Step is specified as a global variable.
+    */
+    int steps = (int)(1/step);
+    for (int vb=0; vb<steps; vb++) {
+        double v = (double)(vb*step);
+        for (int ub=0; ub<steps; ub++) {
+            double u = (double)(ub*step);
+            vector<double> point1 = s.getSurfacePoint(u, v);
+            vector<double> point2 = s.getSurfacePoint(u+step, v);
+            vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+            vector<double> point4 = s.getSurfacePoint(u, v+step);
+            vector<vector<double> > poly;
+            poly.push_back(point1);
+            poly.push_back(point2);
+            poly.push_back(point3);
+            poly.push_back(point4);
+            Polygon * newPoly = Polygon(poly, currID);
+            polygons.push_back(newPoly);
+        }
     }
-  }
 }
 
 //****************************************************

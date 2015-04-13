@@ -329,44 +329,6 @@ void adaptTessellate(Surface s, double u, double v) {
   adaptRecurse(s, trgl2, uv2);
 }
 
-<<<<<<< HEAD
-void tessellate(Surface s, double step, double u, double v) {
-    vector<double> point1 = s.getSurfacePoint(u, v);
-    vector<double> point2 = s.getSurfacePoint(u+step, v);
-    vector<double> point3 = s.getSurfacePoint(u+step, v+step);
-    vector<double> point4 = s.getSurfacePoint(u, v+step);
-    if (!tessellationStrat) {
-        vector<vector<double> > poly;
-        poly.push_back(point1);
-        poly.push_back(point2);
-        poly.push_back(point3);
-        poly.push_back(point4);
-        Polygon toPush = Polygon(poly,currID);
-        polygons.push_back(&toPush);
-    } else {
-        vector<double> actual = s.getSurfacePoint((4*u+2*step)/4, (4*v+2*step)/4);
-        vector<double> current;
-        for (int j=0; j<3; j++) {
-            current.push_back((point1[j]+point2[j]+point3[j]+point4[j])/4);
-        }
-        if (distance(current, actual) < step) {
-            vector<vector<double> > poly;
-            poly.push_back(point1);
-            poly.push_back(point2);
-            poly.push_back(point3);
-            poly.push_back(point4);
-            Polygon toPush = Polygon(poly,currID);
-            polygons.push_back(&toPush);
-        } else {
-            double halfStep = step/2;
-            tessellate(s, halfStep, u, v);
-            tessellate(s, halfStep, u+halfStep, v);
-            tessellate(s, halfStep, u+halfStep, v+halfStep);
-            tessellate(s, halfStep, u, v+halfStep);
-        }
-    } 
-    return;
-=======
 void tessellate(Surface s) {
   /*
   * Perform uniform tessellation on Surface s. Step is specified as a global variable.
@@ -389,7 +351,6 @@ void tessellate(Surface s) {
       polygons.push_back(newPoly);
     }
   }
->>>>>>> 7650d65af33dc35eb86e10a49970c4fb1b2fd88b
 }
 
 //****************************************************
@@ -420,6 +381,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+}
 
 
 

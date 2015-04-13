@@ -27,6 +27,7 @@
 #include <numeric>
 #include <cstdlib>
 #include <vector>
+#include <cmath>
 
 #include "bezier_util.h"
 
@@ -128,7 +129,7 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
     * Tells if errorBound is larger than the distance between points.
     */
-    if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2]), 2)) { 
+    if (errorBound > sqr(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
         return true;
     } else { 
         return false;
@@ -319,7 +320,8 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
                        (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
     if (e1 && e2 && e3) {
-        Polygon * newPoly = Polygon(realcoords, currID);
+        Polygon  newPol = Polygon(realcoords, currID);
+        Polygon* newPoly = &(newPol);
         polygons.push_back(newPoly);
         return;
     } else if (!e1 && e2 && e3) {
@@ -570,9 +572,9 @@ void adaptTessellate(Surface s, double u, double v) {
     vector<vector<double> > uv1;
     vector<vector<double> > trgl2;
     vector<vector<double> > uv2;
-    trgl.push_back(point1);
-    trgl.push_back(point2);
-    trgl.push_back(point3);
+    trgl1.push_back(point1);
+    trgl1.push_back(point2);
+    trgl1.push_back(point3);
     uv1.push_back(pt1uv);
     uv1.push_back(pt2uv);
     uv1.push_back(pt3uv);
@@ -604,7 +606,8 @@ void tessellate(Surface s) {
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
-            Polygon * newPoly = Polygon(poly, currID);
+            Polygon newPol = Polygon(poly, currID);
+            Polygon* newPoly = &newPol;
             polygons.push_back(newPoly);
         }
     }
@@ -628,12 +631,12 @@ int main(int argc, char *argv[]) {
         }
     } else {
         int steps = (int)(1/step);
-        for (int s=0; s<surfaces.size(); i++) {
+        for (int s=0; s<surfaces.size(); s++) {
             for (int vb=0; vb<steps; vb++) {
-                double v = (double)(ub*step);
+                double v = (double)(vb*step);
                 for (int ub=0; ub<steps; ub++) {
                     double u = (double)(ub*step);
-                    adaptTessellate(s, u, v);
+                    adaptTessellate(surfaces[s], u, v);
                 }
             }
         }

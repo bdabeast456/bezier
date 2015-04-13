@@ -128,7 +128,7 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2]), 2)) { 
         return true;
     } else { 
-        return false
+        return false;
     }
 }
 
@@ -206,9 +206,21 @@ void myKey(unsigned char key, int x, int y) {
     matrix m;
     if(key == 43){ // '+' zoom in
         m = matrix(0,0,-increment,0);
+        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+        curCenter = m.multiplyv(curCenter);
+        centerPoint[0] = curCenter.xc();
+        centerPoint[1] = curCenter.yc();
+        centerPoint[2] = curCenter.zc();
+
     }
     if(key == 45){ // '-' zoom out
         m = matrix(0,0,increment,0);
+        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+        curCenter = m.multiplyv(curCenter);
+        centerPoint[0] = curCenter.xc();
+        centerPoint[1] = curCenter.yc();
+        centerPoint[2] = curCenter.zc();
+
     }
     transformPolygons(m);
 }
@@ -217,6 +229,12 @@ void specialKey(int key, int x, int y){
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         m = matrix(0,increment, 0 , 0);
+        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+        curCenter = m.multiplyv(curCenter);
+        centerPoint[0] = curCenter.xc();
+        centerPoint[1] = curCenter.yc();
+        centerPoint[2] = curCenter.zc();
+
     }
     else if(key == GLUT_KEY_UP){
 
@@ -226,6 +244,12 @@ void specialKey(int key, int x, int y){
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
         m = matrix(increment,0, 0 , 0);
+        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+        curCenter = m.multiplyv(curCenter);
+        centerPoint[0] = curCenter.xc();
+        centerPoint[1] = curCenter.yc();
+        centerPoint[2] = curCenter.zc();
+
     }
     else if(key == GLUT_KEY_RIGHT){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
@@ -236,6 +260,12 @@ void specialKey(int key, int x, int y){
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
         m = matrix(0,-increment, 0 , 0);
+        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+        curCenter = m.multiplyv(curCenter);
+        centerPoint[0] = curCenter.xc();
+        centerPoint[1] = curCenter.yc();
+        centerPoint[2] = curCenter.zc();
+
     }
     else if(key == GLUT_KEY_DOWN){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
@@ -246,6 +276,13 @@ void specialKey(int key, int x, int y){
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
         m = matrix(-increment,0, 0 , 0);
+        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+        curCenter = m.multiplyv(curCenter);
+        centerPoint[0] = curCenter.xc();
+        centerPoint[1] = curCenter.yc();
+        centerPoint[2] = curCenter.zc();
+
+
     }
     else if(key == GLUT_KEY_LEFT){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);

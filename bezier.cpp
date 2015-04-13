@@ -54,7 +54,7 @@ class Viewport {
 Viewport	viewport;
 int numSurfaces;
 vector<Surface> surfaces;
-vector<Polygon> polygons;
+vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
 double step;
@@ -123,8 +123,8 @@ void myDisplay() {
 }
 
 void transformPolygons(matrix m){
-    for(std::vector<Polygon>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
-        Polygon polygon = *poly;
+    for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
+        Polygon polygon = **poly;
         vector<Vector4> newVertices;
         for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
             Vector4 vertex = *vert;
@@ -139,8 +139,8 @@ void transformPolygons(matrix m){
 void findCenterPoint(int idCheck){
     vector<double> center;
     int iterationCount = 1;
-    for(std::vector<Polygon>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
-        Polygon polygon = *poly;
+    for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
+        Polygon polygon = **poly;
         if(polygon.id == idCheck){
             for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
                 Vector4 vertex = *vert; 
@@ -206,34 +206,42 @@ void myKey(unsigned char key, int x, int y) {
 void specialKey(int key, int x, int y){
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
-        //cout << "shift and up" << endl;
         m = matrix(0,increment, 0 , 0);
     }
     else if(key == GLUT_KEY_UP){
-        //cout << "up" << endl;
-        m = matrix(0,increment,0,2);
+
+        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m.multiplym(matrix(0,increment,0,2));
+        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
-        //cout << "shift and right" << endl;
         m = matrix(increment,0, 0 , 0);
     }
     else if(key == GLUT_KEY_RIGHT){
-        //cout << "right" << endl;
-        m = matrix(increment,0,0,2);
+        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m.multiplym(matrix(increment,0,0,2));
+        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
+
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
         m = matrix(0,-increment, 0 , 0);
     }
     else if(key == GLUT_KEY_DOWN){
-        m = matrix(0,-increment,0,2);
+        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m.multiplym(matrix(0,-increment,0,2));
+        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
+
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
         m = matrix(-increment,0, 0 , 0);
     }
     else if(key == GLUT_KEY_LEFT){
-        m = matrix(-increment,0,0,2);
+        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m.multiplym(matrix(-increment,0,0,2));
+        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
+
     }
     transformPolygons(m);
 
@@ -251,7 +259,8 @@ void tessellate(Surface s, double step, double u, double v) {
         poly.push_back(point2);
         poly.push_back(point3);
         poly.push_back(point4);
-        polygons.push_back(Polygon(poly, currID));
+        Polygon toPush = Polygon(poly,currID);
+        polygons.push_back(&toPush);
     } else {
         vector<double> actual = s.getSurfacePoint((4*u+2*step)/4, (4*v+2*step)/4);
         vector<double> current;
@@ -264,7 +273,8 @@ void tessellate(Surface s, double step, double u, double v) {
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
-            polygons.push_back(Polygon(poly, currID));
+            Polygon toPush = Polygon(poly,currID);
+            polygons.push_back(&toPush);
         } else {
             double halfStep = step/2;
             tessellate(s, halfStep, u, v);

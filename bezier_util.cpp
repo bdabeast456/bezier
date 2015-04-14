@@ -83,7 +83,7 @@ void Vector4::unit() {
 }
 
 Vector4 Vector4::sub(Vector4 v) {
-    Vector4 newV = Vector4(x-v.x(), y-v.y(), z-v.z(), 0);
+    Vector4 newV = Vector4(x-v.xc(), y-v.yc(), z-v.zc(), 0);
 
 }
 

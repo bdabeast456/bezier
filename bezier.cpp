@@ -90,7 +90,7 @@ void myReshape(int w, int h) {
     glViewport (0,0,viewport.w,viewport.h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-3, 3, -3, 3, 20, -1500);
+    glFrustum(-3, 3, -3, 3, INFINITY, -INFINITY);
     //gluPerspective(60,200,-15000,-15000);
 }
 
@@ -113,12 +113,12 @@ void myDisplay() {
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
-        for (int j=0; j<verTemp.size(); j++) {
-            Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-            Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
-            Vector4 crossP = v1.cross(v2);
-            crossP.unit();
-            glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+        for (int j=verTemp.size()-1; j>=0; j--) {
+            //Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+            //Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+            //Vector4 crossP = v2.cross(v1);
+            //crossP.unit();
+            //glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }
         glEnd();
@@ -247,13 +247,7 @@ void specialKey(int key, int x, int y){
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         m = matrix(0,translateIncrement, 0 , 0);
-        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-          curCenter = m.multiplyv(curCenter);
-          centerPoint[0] = curCenter.xc();
-          centerPoint[1] = curCenter.yc();
-          centerPoint[2] = curCenter.zc();
-         */
-
+        centerPoint[1] = centerPoint[1] + translateIncrement;
     }
     else if(key == GLUT_KEY_UP){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
@@ -262,13 +256,7 @@ void specialKey(int key, int x, int y){
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
         m = matrix(translateIncrement,0, 0 , 0);
-        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-          curCenter = m.multiplyv(curCenter);
-          centerPoint[0] = curCenter.xc();
-          centerPoint[1] = curCenter.yc();
-          centerPoint[2] = curCenter.zc();
-         */
-
+        centerPoint[0] = centerPoint[0] + translateIncrement;
     }
     else if(key == GLUT_KEY_RIGHT){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
@@ -279,13 +267,7 @@ void specialKey(int key, int x, int y){
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
         m = matrix(0,-translateIncrement, 0 , 0);
-        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-          curCenter = m.multiplyv(curCenter);
-          centerPoint[0] = curCenter.xc();
-          centerPoint[1] = curCenter.yc();
-          centerPoint[2] = curCenter.zc();
-         */
-
+        centerPoint[1] = centerPoint[1] - translateIncrement;
     }
     else if(key == GLUT_KEY_DOWN){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
@@ -296,13 +278,7 @@ void specialKey(int key, int x, int y){
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
         m = matrix(-translateIncrement,0, 0 , 0);
-        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-          curCenter = m.multiplyv(curCenter);
-          centerPoint[0] = curCenter.xc();
-          centerPoint[1] = curCenter.yc();
-          centerPoint[2] = curCenter.zc();*/
-
-
+        centerPoint[0] = centerPoint[0] - translateIncrement;
     }
     else if(key == GLUT_KEY_LEFT){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
@@ -311,12 +287,6 @@ void specialKey(int key, int x, int y){
 
 
     }
-    Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-    curCenter = m.multiplyv(curCenter);
-    centerPoint[0] = curCenter.xc();
-    centerPoint[1] = curCenter.yc();
-    centerPoint[2] = curCenter.zc();
-
     transformPolygons(m);    
 }
 

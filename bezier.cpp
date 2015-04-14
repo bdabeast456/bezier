@@ -789,6 +789,7 @@ int main(int argc, char *argv[]) {
                     numSurfaces = atof(string(token[0]).c_str());
                 }
                 else{
+                    cout << "probe" << endl;
                     double totalPatch[4][3];
                     totalPatch[0][0] = atof(string(token[0]).c_str());
                     totalPatch[0][1] = atof(string(token[1]).c_str());

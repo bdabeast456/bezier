@@ -322,8 +322,7 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
     if (e1 && e2 && e3) {
-        Polygon  newPol = Polygon(realcoords, currID);
-        Polygon* newPoly = &(newPol);
+        Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
         return;
     } else if (!e1 && e2 && e3) {
@@ -608,8 +607,7 @@ void tessellate(Surface s) {
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
-            Polygon newPol = Polygon(poly, currID);
-            Polygon* newPoly = &newPol;
+            Polygon* newPoly = new Polygon(poly, currID);
             polygons.push_back(newPoly);
         }
     }
@@ -627,8 +625,7 @@ void tessellate(Surface s) {
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
-            Polygon newPol = Polygon(poly, currID);
-            Polygon* newPoly = &newPol;
+            Polygon* newPoly = new Polygon(poly, currID);
             polygons.push_back(newPoly);
         }
         double u = (double)(steps*step);
@@ -643,8 +640,7 @@ void tessellate(Surface s) {
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
-            Polygon newPol = Polygon(poly, currID);
-            Polygon* newPoly = &newPol;
+            Polygon* newPoly = new Polygon(poly, currID);
             polygons.push_back(newPoly);
         }
         v = steps*step;

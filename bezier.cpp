@@ -105,7 +105,7 @@ void myDisplay() {
 
     for (int i=0; i<polygons.size(); i++) {
         Polygon* temp = polygons[i];
-        if (temp->id == currID) {
+        if (temp->id[0] == currID) {
             glColor3f(1.0f, 1.0f, 0.0f);
         } else {
             glColor3f(1.0f, 0.0f, 1.0f);

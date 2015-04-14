@@ -170,7 +170,7 @@ Polygon::Polygon(vector<vector<double> > vx, int ident) {
 	for (int i=0; i<vx.size(); i++) {
 		vertices.push_back(Vector4(vx[i][0], vx[i][1], vx[i][2], 1));
 	}
-	id = ident;
+	id.push_back(ident);
 }
 
 matrix::matrix() {

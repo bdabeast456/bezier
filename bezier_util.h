@@ -65,7 +65,7 @@ public:
 	Polygon(){};
 	Polygon(vector<vector<double> > vx, int ident);
 	vector<Vector4> vertices;
-	int id; 
+	vector<int> id; 
 };
 
 class matrix {

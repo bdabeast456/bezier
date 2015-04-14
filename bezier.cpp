@@ -724,12 +724,15 @@ int main(int argc, char *argv[]) {
         double **patchThree;
         double **patchFour;
         cout << "Parsing BEZ file" << endl;
+        const char* empty[1] = {};
         while (!myFile.eof()){
             char buf[MAX_CHARS_PER_LINE];
             myFile.getline(buf, MAX_CHARS_PER_LINE);
             const char* token[MAX_TOKENS_PER_LINE] = {}; 
             token[0] = strtok(buf, DELIMITER); // first token
-            if (token[0]){
+            //cout << token[0] << endl;
+
+            if (strcmp(token[0],empty[0]){
                 int length = 0;
                 for (int n = 1; n < MAX_TOKENS_PER_LINE; n++) {
                     token[n] = strtok(0,DELIMITER);
@@ -738,7 +741,11 @@ int main(int argc, char *argv[]) {
                         break;
                     }
                 }
-                //string first = string(token[0]).c_str();
+                
+                string first = string(token[0]).c_str();
+                cout << lineNumber << endl;
+                //int check = strcmp(first," ")
+                //cout << check << endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -804,7 +811,9 @@ int main(int argc, char *argv[]) {
 
                 }
                 lineNumber+=1;
+                cout << lineNumber << endl;
             } // end of if(token[0])
+            cout << "new line" << endl;
         } // end of while(!myFile.eof())
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
@@ -838,6 +847,7 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+        surfaces.clear();
 
     } // end of parsing 
 

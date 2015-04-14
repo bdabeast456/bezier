@@ -630,7 +630,7 @@ void tessellate(Surface s) {
             polygons.push_back(newPoly);
         }
         double u = (double)(steps*step);
-        for (int vb=0; vb<steps; ub++) {
+        for (int vb=0; vb<steps; vb++) {
             v = (double)(vb*step);
             vector<double> point1 = s.getSurfacePoint(u, v);
             vector<double> point2 = s.getSurfacePoint(1, v);
@@ -696,7 +696,7 @@ int main(int argc, char *argv[]) {
                     adaptTessellate(surfaces[s], u, v, u+step, 1);
                 }
                 double u = (double)(steps*step);
-                for (int vb=0; vb<steps; ub++) {
+                for (int vb=0; vb<steps; vb++) {
                     v = (double)(vb*step);
                     adaptTessellate(surfaces[s], u, v, 1, v+step);
                 }

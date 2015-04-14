@@ -105,16 +105,21 @@ void myDisplay() {
 
 
     for (int i=0; i<polygons.size(); i++) {
+<<<<<<< HEAD
         Polygon temp = *(polygons[i]);
         if (temp.id == currID) {
+=======
+        Polygon* temp = polygons[i];
+        if (temp->id == currID) {
+>>>>>>> 1d13ca714f4871306c34a40723a68d8352e38a0d
             glColor3f(1.0f, 1.0f, 0.0f);
         } else {
             glColor3f(1.0f, 0.0f, 1.0f);
         }
         glBegin(GL_POLYGON);
-        vector<double> verTemp = temp.vertices;
+        vector<Vector4> verTemp = temp->vertices;
         for (int j=0; j<verTemp.size(); j++) {
-            glVertex3f(verTemp[j].xc(), verTemp.yc(), verTemp.zc());
+            glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }
         glEnd();
     }

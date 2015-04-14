@@ -59,7 +59,7 @@ vector<Surface> surfaces;
 vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step = .01;
+double step = .1;
 double errorBound;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
@@ -87,6 +87,7 @@ void myReshape(int w, int h) {
     glViewport (0,0,viewport.w,viewport.h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    glOrtho(-3, 3, -3, 3, 20, -1500);
 
 }
 

@@ -163,6 +163,7 @@ void findCenterPoint(int idCheck){
     /*
      * Calculates "center" of the shape represented by an input file.
      */
+<<<<<<< Updated upstream
     vector<double> center;
     int iterationCount = 1;
     //for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
@@ -188,6 +189,28 @@ void findCenterPoint(int idCheck){
                 }
                 //cout << "finished" << endl;
                 iterationCount = iterationCount+1;
+=======
+    //vector<double> center;
+    for (int i=0; i<3; i++) {
+        centerPoint.push_back(0);
+    }
+    int iterationCount = 0;
+    cout << polygons.size() << endl;
+    for(int i=0; i<polygons.size(); i++) {
+        cout << i << endl;
+        Polygon polygon = *(polygons[i]);
+        cout << "CAPPED" << endl;
+        if(polygon.id[0] == idCheck){
+            for(int j=0; j<polygon.vertices.size(); j++){
+                Vector4 vertex = polygon.vertices[j];
+                                                //cout << iterationCount << endl;
+ 
+                cout << vertex.xc() << " " << vertex.yc() << " " << vertex.zc() << endl;
+                centerPoint[0] = centerPoint[0] + vertex.xc();
+                centerPoint[1] = centerPoint[1] + vertex.yc();
+                centerPoint[2] = centerPoint[2] + vertex.zc();
+                iterationCount++;
+>>>>>>> Stashed changes
             }
         }
 
@@ -676,8 +699,7 @@ void tessellate(Surface s) {
         poly.push_back(point2);
         poly.push_back(point3);
         poly.push_back(point4);
-        Polygon newPol = Polygon(poly, currID);
-        Polygon* newPoly = &newPol;
+        Polygon* newPoly = new Polygon(poly, currID);
         polygons.push_back(newPoly);        
     }
 }

@@ -154,7 +154,11 @@ void transformPolygons(matrix m){
             Vector4 newVertex = m.multiplyv(vertex);
             newVertices.push_back(newVertex);
         }
-        polygon.vertices = newVertices;
+        //cout << "Before: " << polygon.vertices[0].xc() << ", " << polygon.vertices[0].yc() << ", " << polygon.vertices[0].zc()  << endl;
+        //cout << "newVertcies: " << newVertices[0].xc() << ", " << newVertices[0].yc() << ", " << newVertices[0].zc()  << endl;
+        (**poly).vertices = newVertices;
+        //cout << "polygon After: " << polygon.vertices[0].xc() << ", " << polygon.vertices[0].yc() << ", " << polygon.vertices[0].zc()  << endl;
+
 
     }
 

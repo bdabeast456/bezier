@@ -60,7 +60,7 @@ vector<Surface> surfaces;
 vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step = .01;
+double step = .1;
 double errorBound;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
@@ -88,6 +88,7 @@ void myReshape(int w, int h) {
     glViewport (0,0,viewport.w,viewport.h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    glOrtho(-3, 3, -3, 3, 20, -1500);
 
 }
 
@@ -104,7 +105,7 @@ void myDisplay() {
 
 
     for (int i=0; i<polygons.size(); i++) {
-        Polygon temp = polygons[i];
+        Polygon temp = *(polygons[i]);
         if (temp.id == currID) {
             glColor3f(1.0f, 1.0f, 0.0f);
         } else {
@@ -673,15 +674,17 @@ int main(int argc, char *argv[]) {
     }
     //#include <string.h>
     //for (int i=1; i<argc; i++) {
-    string arg;
-    arg1 = string(argv[1]);
-    arg2 = string(argv[2]);
-    if(strlen(arg.c_str()) >= 4){
-        string last4 = arg.substr(strlen(arg.c_str())-4,string::npos);
+    string arg1 = string(argv[1]);
+    string arg2 = string(argv[2]);
+    if(strlen(arg1.c_str()) >= 4){
+        string last4 = arg1.substr(strlen(arg1.c_str())-4,string::npos);
         if(last4 == ".bez"){
             cout << "wow .bez file found!" << endl;
-            readFile = arg;
-            continue;       
+            readFile = arg1;
+        }
+        else{
+            cout << "input file not in .bez format" << endl;
+            exit(0);
         }
     }
 
@@ -692,12 +695,24 @@ int main(int argc, char *argv[]) {
     else if(argc > 3 && string(argv[3]) == "-a"){
          errorBound = possibleStep;
     }
-
     else {
         std::cout << "Unrecognized argument. Please review usage." << std::endl;
         exit(0);
     }
+    //start parsing readFile
+    ifstream myFile;
+    myFile.open(readFile);
+    if(readFile == ""){
+        cout << "No input provided. Please review usage." << std::endl;
+        exit(0);
+    }
+    else{
+        cout << "Parsing BEZ file" << endl;
+        while (!myFile.eof()){
+        }
+    }
 
+    
 
     if (!tessellationStrat) {
         for (int i=0; i<surfaces.size(); i++) {

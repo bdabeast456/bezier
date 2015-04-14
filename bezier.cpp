@@ -111,7 +111,7 @@ void myDisplay() {
             glColor3f(1.0f, 0.0f, 1.0f);
         }
         glBegin(GL_POLYGON);
-        vector<double> verTemp = temp->vertices;
+        vector<Vector4> verTemp = temp->vertices;
         for (int j=0; j<verTemp.size(); j++) {
             glVertex3f(verTemp[j].xc(), verTemp.yc(), verTemp.zc());
         }

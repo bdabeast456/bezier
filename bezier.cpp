@@ -96,7 +96,7 @@ void myReshape(int w, int h) {
 // function that does the actual drawing of stuff
 //***************************************************
 void myDisplay() {
-
+    cout << "in myDisplay" << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);               // clear the color buffer
 
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
@@ -125,6 +125,7 @@ void myDisplay() {
 
     glFlush();
     glutSwapBuffers();                  // swap buffers (we earlier set double buffer)
+    cout << "end of myDisplay" << endl;
 }
 
 bool distance(double x1, double y1, double z1, vector<double> coords) {
@@ -724,6 +725,26 @@ int main(int argc, char *argv[]) {
         double patchThree[4][3];
         double patchFour[4][3];
         cout << "Parsing BEZ file" << endl;
+        std::string str;
+        string to_add = " ";
+        std::vector<std::string> vec, result_vec;
+        while (std::getline(myFile, str)) {
+            vec.push_back(str);
+        }
+        for(std::vector<string>::iterator it = vec.begin(); it != vec.end(); ++it) {
+            string s = *it;
+            s.insert(s.length(),1, to_add[0]);
+            s.erase(std::remove(s.begin(), s.end(), '\r'), s.end());
+            result_vec.push_back(s);
+        }
+        std::ofstream out_file(readFile);
+        std::copy(result_vec.begin(), result_vec.end(), std::ostream_iterator<std::string>(out_file, "\n"));
+        out_file.clear();
+        out_file.close();
+
+        myFile.clear();
+        myFile.seekg(0, ios::beg);
+
         while (!myFile.eof()){
             //cout << "new line!" << endl;
             char buf[MAX_CHARS_PER_LINE];
@@ -881,7 +902,9 @@ int main(int argc, char *argv[]) {
     glutSpecialFunc(specialKey);
     glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
     glDepthFunc(GL_LEQUAL);
+    //cout << "out of myDisplay" <<endl;
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
+    //cout << "mainLoop?" << endl;
     // and whatever else
 
 

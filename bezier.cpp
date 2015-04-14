@@ -68,6 +68,7 @@ bool wireFrame = false; // if false, do filled. if true, do wireframe
 double rotIncrement =1.5;
 double translateIncrement = 0.1;
 vector<double> centerPoint;
+double zoom = 1;
 
 
 //****************************************************
@@ -90,7 +91,7 @@ void myReshape(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-3, 3, -3, 3, 20, -1500);
-
+    //gluPerspective(60,200,-15000,-15000);
 }
 
 //****************************************************
@@ -102,7 +103,7 @@ void myDisplay() {
 
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
     glLoadIdentity();                       // make sure transformation is "zero'd"
-
+    glScalef(zoom,zoom,zoom);
 
     for (int i=0; i<polygons.size(); i++) {
         //cout << "entering myDIsplay's forLoop" << endl;
@@ -155,7 +156,6 @@ void transformPolygons(matrix m){
             Vector4 newVertex = m.multiplyv(vertex);
             newVertices.push_back(newVertex);
         }
-        //cout << "Before: " << polygon.vertices[0].xc() << ", " << polygon.vertices[0].yc() << ", " << polygon.vertices[0].zc()  << endl;
         //cout << "newVertcies: " << newVertices[0].xc() << ", " << newVertices[0].yc() << ", " << newVertices[0].zc()  << endl;
         (**poly).vertices = newVertices;
         //cout << "polygon After: " << polygon.vertices[0].xc() << ", " << polygon.vertices[0].yc() << ", " << polygon.vertices[0].zc()  << endl;
@@ -229,6 +229,7 @@ void myKey(unsigned char key, int x, int y) {
 
     }
     matrix m;
+    //zoom = 1;
     if(key == 43){ // '+' zoom in
         m = matrix(0,0,-translateIncrement,0);
         Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
@@ -236,6 +237,7 @@ void myKey(unsigned char key, int x, int y) {
         centerPoint[0] = curCenter.xc();
         centerPoint[1] = curCenter.yc();
         centerPoint[2] = curCenter.zc();
+        zoom += translateIncrement;
 
     }
     if(key == 45){ // '-' zoom out
@@ -245,6 +247,7 @@ void myKey(unsigned char key, int x, int y) {
         centerPoint[0] = curCenter.xc();
         centerPoint[1] = curCenter.yc();
         centerPoint[2] = curCenter.zc();
+        zoom -= translateIncrement;
 
     }
     transformPolygons(m);

@@ -846,7 +846,6 @@ int main(int argc, char *argv[]) {
 //This initializes glut
 glutInit(&argc, argv);
 //This tells glut to use a double-buffered window with red, green, and blue channels 
-std::cout << "Have " << argc << " arguments:" << std::endl;
 
 glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 

@@ -548,7 +548,7 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     }
 }
 
-void adaptTessellate(Surface s, double u, double v) {
+void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
     * Starting routine for adaptive tessellation.
     */
@@ -556,15 +556,15 @@ void adaptTessellate(Surface s, double u, double v) {
     vector<double> pt1uv;
     pt1uv.push_back(u);
     pt1uv.push_back(v);
-    vector<double> point2 = s.getSurfacePoint(u+step, v);
+    vector<double> point2 = s.getSurfacePoint(uend, v);
     vector<double> pt2uv;
     pt2uv.push_back(u+step);
     pt2uv.push_back(v);
-    vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+    vector<double> point3 = s.getSurfacePoint(uend, vend);
     vector<double> pt3uv;
     pt1uv.push_back(u+step);
     pt1uv.push_back(v+step);
-    vector<double> point4 = s.getSurfacePoint(u, v+step);
+    vector<double> point4 = s.getSurfacePoint(u, vend);
     vector<double> pt4uv;
     pt4uv.push_back(u);
     pt4uv.push_back(v+step);
@@ -611,6 +611,54 @@ void tessellate(Surface s) {
             polygons.push_back(newPoly);
         }
     }
+    //Cleanup if necessary.
+    if (1-(steps*step) > .0000001) {
+        double v = (double)(steps*step);
+        for (int ub=0; ub<steps; ub++) {
+            double u = (double)(ub*step);
+            vector<double> point1 = s.getSurfacePoint(u, v);
+            vector<double> point2 = s.getSurfacePoint(u+step, v);
+            vector<double> point3 = s.getSurfacePoint(u+step, 1);
+            vector<double> point4 = s.getSurfacePoint(u, 1);
+            vector<vector<double> > poly;
+            poly.push_back(point1);
+            poly.push_back(point2);
+            poly.push_back(point3);
+            poly.push_back(point4);
+            Polygon newPol = Polygon(poly, currID);
+            Polygon* newPoly = &newPol;
+            polygons.push_back(newPoly);
+        }
+        double u = (double)(steps*step);
+        for (int vb=0; vb<steps; ub++) {
+            v = (double)(vb*step);
+            vector<double> point1 = s.getSurfacePoint(u, v);
+            vector<double> point2 = s.getSurfacePoint(1, v);
+            vector<double> point3 = s.getSurfacePoint(1, v+step);
+            vector<double> point4 = s.getSurfacePoint(u, v+step);
+            vector<vector<double> > poly;
+            poly.push_back(point1);
+            poly.push_back(point2);
+            poly.push_back(point3);
+            poly.push_back(point4);
+            Polygon newPol = Polygon(poly, currID);
+            Polygon* newPoly = &newPol;
+            polygons.push_back(newPoly);
+        }
+        v = steps*step;
+        vector<double> point1 = s.getSurfacePoint(u, v);
+        vector<double> point2 = s.getSurfacePoint(1, v);
+        vector<double> point3 = s.getSurfacePoint(1, 1);
+        vector<double> point4 = s.getSurfacePoint(u, 1);
+        vector<vector<double> > poly;
+        poly.push_back(point1);
+        poly.push_back(point2);
+        poly.push_back(point3);
+        poly.push_back(point4);
+        Polygon newPol = Polygon(poly, currID);
+        Polygon* newPoly = &newPol;
+        polygons.push_back(newPoly);        
+    }
 }
 
 //****************************************************
@@ -634,10 +682,26 @@ int main(int argc, char *argv[]) {
         for (int s=0; s<surfaces.size(); s++) {
             for (int vb=0; vb<steps; vb++) {
                 double v = (double)(vb*step);
+                double vend = v+step;
                 for (int ub=0; ub<steps; ub++) {
                     double u = (double)(ub*step);
-                    adaptTessellate(surfaces[s], u, v);
+                    adaptTessellate(surfaces[s], u, v, u+step, vend);
                 }
+            }
+            //Cleanup if necessary.
+            if (1-(steps*step) > .0000001) {
+                double v = (double)(steps*step);
+                for (int ub=0; ub<steps; ub++) {
+                    double u = (double)(ub*step);
+                    adaptTessellate(surfaces[s], u, v, u+step, 1);
+                }
+                double u = (double)(steps*step);
+                for (int vb=0; vb<steps; ub++) {
+                    v = (double)(vb*step);
+                    adaptTessellate(surfaces[s], u, v, 1, v+step);
+                }
+                v = steps*step;
+                adaptTessellate(surfaces[s], u, v, 1, 1);   
             }
         }
     }
@@ -665,6 +729,7 @@ int main(int argc, char *argv[]) {
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else
 

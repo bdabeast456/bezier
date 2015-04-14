@@ -783,6 +783,8 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
+                            cout << "TEST" << endl;
+
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -790,7 +792,6 @@ int main(int argc, char *argv[]) {
                     double totalPatch[4][3];
                     totalPatch[0][0] = atof(string(token[0]).c_str());
                     totalPatch[0][1] = atof(string(token[1]).c_str());
-                    //cout << "second item: " << totalPatch[0][1] << endl;
                     totalPatch[0][2] = atof(string(token[2]).c_str());
 
                     totalPatch[1][0] = atof(string(token[3]).c_str());
@@ -821,7 +822,6 @@ int main(int argc, char *argv[]) {
                         }                    
                     }
                     else if(patchNum[0] == 2){
-
                         for(int i = 0; i < 4; i ++){
                             for (int j = 0; j < 4; j++){
                                 //cout << patchNum << endl;
@@ -837,15 +837,8 @@ int main(int argc, char *argv[]) {
                             }
                         }
                     }
-                    //cout << patchNum << endl;
-                                    cout << "DID SOMETHING HAPPEN" << endl;
-
                     patchNum[0]+=1;
-                                    cout << "DID SOMETHING HAPPEN" << endl;
-
                     if(patchNum[0] >=4){ // CALCULATE SURFACE
-                cout << "DID SOMETHING HAPPEN" << endl;
-
                         Surface sur = Surface(patchOne,patchTwo,patchThree,patchFour);
                         surfaces.push_back(sur);
                         //curSurface.clear();
@@ -855,11 +848,7 @@ int main(int argc, char *argv[]) {
                 }
                 lineNumber+=1;
             } // end of if(token[0])
-
-
         } // end of while(!myFile.eof())
-                        cout << "DID SOMETHING HAPPEN" << endl;
-
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
                 tessellate(surfaces[i]);

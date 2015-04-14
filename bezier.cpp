@@ -88,23 +88,8 @@ void myReshape(int w, int h) {
     glViewport (0,0,viewport.w,viewport.h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, viewport.w, 0, viewport.h);
 
 }
-
-
-//****************************************************
-// A routine to set a pixel by drawing a GL point.  This is not a
-// general purpose routine as it assumes a lot of stuff specific to
-// this example.
-//****************************************************
-
-void setPixel(int x, int y, GLfloat r, GLfloat g, GLfloat b) {
-    glColor3f(r, g, b);
-    glVertex2f(x + 0.5, y + 0.5);   // The 0.5 is to target pixel
-}
-
-
 
 
 //****************************************************
@@ -117,10 +102,21 @@ void myDisplay() {
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
     glLoadIdentity();                       // make sure transformation is "zero'd"
 
-    /*
-     * CALL THE FUNCTIONS THAT DO BEZIER STUFF HERE
-     */
 
+    for (int i=0; i<polygons.size(); i++) {
+        Polygon temp = polygons[i];
+        if (temp.id == currID) {
+            glColor3f(1.0f, 1.0f, 0.0f);
+        } else {
+            glColor3f(1.0f, 0.0f, 1.0f);
+        }
+        glBegin(GL_POLYGON);
+        vector<double> verTemp = temp.vertices;
+        for (int j=0; j<verTemp.size(); j++) {
+            glVertex3f(verTemp[j].xc(), verTemp.yc(), verTemp.zc());
+        }
+        glEnd();
+    }
 
     glFlush();
     glutSwapBuffers();                  // swap buffers (we earlier set double buffer)
@@ -740,7 +736,7 @@ int main(int argc, char *argv[]) {
     //This tells glut to use a double-buffered window with red, green, and blue channels 
     std::cout << "Have " << argc << " arguments:" << std::endl;
 
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
     // Initalize theviewport size
     viewport.w = 400;

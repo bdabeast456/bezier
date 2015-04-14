@@ -96,7 +96,7 @@ void myReshape(int w, int h) {
 // function that does the actual drawing of stuff
 //***************************************************
 void myDisplay() {
-    cout << "in myDisplay" << endl;
+    //cout << "in myDisplay" << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);               // clear the color buffer
 
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
@@ -107,13 +107,13 @@ void myDisplay() {
         //cout << "entering myDIsplay's forLoop" << endl;
         Polygon* temp = polygons[i];
         if (temp->id[0] == currID) {
-            glColor3f(1.0f, 1.0f, 0.0f);
+            glColor3f(1.0f, 0.5f, 0.0f);
         } else {
             glColor3f(1.0f, 0.0f, 1.0f);
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
-        cout << "hi" << endl;
+        //cout << "hi" << endl;
         for (int j=0; j<verTemp.size(); j++) {
             Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
             Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
@@ -127,7 +127,7 @@ void myDisplay() {
 
     glFlush();
     glutSwapBuffers();                  // swap buffers (we earlier set double buffer)
-    cout << "end of myDisplay" << endl;
+    //cout << "end of myDisplay" << endl;
 }
 
 bool distance(double x1, double y1, double z1, vector<double> coords) {
@@ -145,6 +145,7 @@ void transformPolygons(matrix m){
     /*
      * Applies the transformation m to points defining tessellated polygons.
      */
+    //cout << "gets here" << endl;
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
         vector<Vector4> newVertices;
@@ -153,6 +154,7 @@ void transformPolygons(matrix m){
             Vector4 newVertex = m.multiplyv(vertex);
             newVertices.push_back(newVertex);
         }
+        polygon.vertices = newVertices;
 
     }
 
@@ -257,7 +259,7 @@ void specialKey(int key, int x, int y){
 
     }
     else if(key == GLUT_KEY_UP){
-
+        //cout << increment << endl;
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
         m.multiplym(matrix(0,increment,0,2));
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
@@ -685,7 +687,7 @@ int main(int argc, char *argv[]) {
     if(strlen(arg1.c_str()) >= 4){
         string last4 = arg1.substr(strlen(arg1.c_str())-4,string::npos);
         if(last4 == ".bez"){
-            cout << "wow .bez file found!" << endl;
+            //cout << "wow .bez file found!" << endl;
             readFile = arg1;
         }
         else{
@@ -865,10 +867,11 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+        findCenterPoint(currID);
         surfaces.clear();
 
     } // end of parsing 
-    cout << "END OF PARSING. ALL" << endl;
+    cout << "END OF PARSING." << endl;
 
 
 

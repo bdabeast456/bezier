@@ -65,7 +65,8 @@ double errorBound;
 bool flatShading = false; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down
-double increment = 0.1;
+double rotIncrement =1.5;
+double translateIncrement = 0.1;
 vector<double> centerPoint;
 
 
@@ -161,6 +162,7 @@ void transformPolygons(matrix m){
 
 
     }
+    myDisplay();
 
 }
 
@@ -228,7 +230,7 @@ void myKey(unsigned char key, int x, int y) {
     }
     matrix m;
     if(key == 43){ // '+' zoom in
-        m = matrix(0,0,-increment,0);
+        m = matrix(0,0,-translateIncrement,0);
         Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
         curCenter = m.multiplyv(curCenter);
         centerPoint[0] = curCenter.xc();
@@ -237,7 +239,7 @@ void myKey(unsigned char key, int x, int y) {
 
     }
     if(key == 45){ // '-' zoom out
-        m = matrix(0,0,increment,0);
+        m = matrix(0,0,translateIncrement,0);
         Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
         curCenter = m.multiplyv(curCenter);
         centerPoint[0] = curCenter.xc();
@@ -254,68 +256,78 @@ void specialKey(int key, int x, int y){
      */
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
-        m = matrix(0,increment, 0 , 0);
-        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-        curCenter = m.multiplyv(curCenter);
-        centerPoint[0] = curCenter.xc();
-        centerPoint[1] = curCenter.yc();
-        centerPoint[2] = curCenter.zc();
+        m = matrix(0,translateIncrement, 0 , 0);
+        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+          curCenter = m.multiplyv(curCenter);
+          centerPoint[0] = curCenter.xc();
+          centerPoint[1] = curCenter.yc();
+          centerPoint[2] = curCenter.zc();
+         */
 
     }
     else if(key == GLUT_KEY_UP){
         //cout << increment << endl;
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
-        m.multiplym(matrix(0,increment,0,2));
+        m.multiplym(matrix(rotIncrement,0,0,2));
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
-        m = matrix(increment,0, 0 , 0);
-        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-        curCenter = m.multiplyv(curCenter);
-        centerPoint[0] = curCenter.xc();
-        centerPoint[1] = curCenter.yc();
-        centerPoint[2] = curCenter.zc();
+        m = matrix(translateIncrement,0, 0 , 0);
+        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+          curCenter = m.multiplyv(curCenter);
+          centerPoint[0] = curCenter.xc();
+          centerPoint[1] = curCenter.yc();
+          centerPoint[2] = curCenter.zc();
+         */
 
     }
     else if(key == GLUT_KEY_RIGHT){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
-        m.multiplym(matrix(increment,0,0,2));
+        m.multiplym(matrix(0,rotIncrement,0,2));
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
 
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_DOWN){
-        m = matrix(0,-increment, 0 , 0);
-        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-        curCenter = m.multiplyv(curCenter);
-        centerPoint[0] = curCenter.xc();
-        centerPoint[1] = curCenter.yc();
-        centerPoint[2] = curCenter.zc();
+        m = matrix(0,-translateIncrement, 0 , 0);
+        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+          curCenter = m.multiplyv(curCenter);
+          centerPoint[0] = curCenter.xc();
+          centerPoint[1] = curCenter.yc();
+          centerPoint[2] = curCenter.zc();
+         */
 
     }
     else if(key == GLUT_KEY_DOWN){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
-        m.multiplym(matrix(0,-increment,0,2));
+        m.multiplym(matrix(-rotIncrement,0,0,2));
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
 
     }
 
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_LEFT){
-        m = matrix(-increment,0, 0 , 0);
-        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-        curCenter = m.multiplyv(curCenter);
-        centerPoint[0] = curCenter.xc();
-        centerPoint[1] = curCenter.yc();
-        centerPoint[2] = curCenter.zc();
+        m = matrix(-translateIncrement,0, 0 , 0);
+        /*Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+          curCenter = m.multiplyv(curCenter);
+          centerPoint[0] = curCenter.xc();
+          centerPoint[1] = curCenter.yc();
+          centerPoint[2] = curCenter.zc();*/
 
 
     }
     else if(key == GLUT_KEY_LEFT){
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
-        m.multiplym(matrix(-increment,0,0,2));
+        m.multiplym(matrix(0,-rotIncrement,0,2));
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
 
+
     }
+    Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
+    curCenter = m.multiplyv(curCenter);
+    centerPoint[0] = curCenter.xc();
+    centerPoint[1] = curCenter.yc();
+    centerPoint[2] = curCenter.zc();
+
     transformPolygons(m);    
 }
 

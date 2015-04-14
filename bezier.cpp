@@ -717,21 +717,22 @@ int main(int argc, char *argv[]) {
     }
     else{
         int lineNumber= 1;
-        int patchNum = 0; // when == 4, parse current set of patches into surfaces
-        double **patchOne;
-        double **patchTwo;
-        double **patchThree;
-        double **patchFour;
+        vector<int> patchNum; // when == 4, parse current set of patches into surfaces
+        patchNum.push_back(0);
+        double patchOne[4][3];
+        double patchTwo[4][3];
+        double patchThree[4][3];
+        double patchFour[4][3];
         cout << "Parsing BEZ file" << endl;
-        const char* empty[1] = {};
         while (!myFile.eof()){
+            //cout << "new line!" << endl;
             char buf[MAX_CHARS_PER_LINE];
             myFile.getline(buf, MAX_CHARS_PER_LINE);
             const char* token[MAX_TOKENS_PER_LINE] = {}; 
             token[0] = strtok(buf, DELIMITER); // first token
             //cout << token[0] << endl;
 
-            if (strcmp(token[0],empty[0]){
+            if (token[0]){
                 int length = 0;
                 for (int n = 1; n < MAX_TOKENS_PER_LINE; n++) {
                     token[n] = strtok(0,DELIMITER);
@@ -740,79 +741,83 @@ int main(int argc, char *argv[]) {
                         break;
                     }
                 }
-                
+
                 string first = string(token[0]).c_str();
-                cout << lineNumber << endl;
+                //cout << lineNumber << endl;
+                //string second = string(token[1]).c_str();
+                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
+
                 //int check = strcmp(first," ")
                 //cout << check << endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
                 else{
+                    double totalPatch[4][3];
+                    totalPatch[0][0] = atof(string(token[0]).c_str());
+                    totalPatch[0][1] = atof(string(token[1]).c_str());
+                    cout << "second item: " << totalPatch[0][1] << endl;
+                    totalPatch[0][2] = atof(string(token[2]).c_str());
 
-                    double firstPoint[3];
-                    double secondPoint[3];
-                    double thirdPoint[3];
-                    double fourthPoint[3];
-                    double **totalPatch;
-                    firstPoint[0] = atof(string(token[0]).c_str());
-                    firstPoint[1] = atof(string(token[1]).c_str());
-                    firstPoint[2] = atof(string(token[2]).c_str());
+                    totalPatch[1][0] = atof(string(token[3]).c_str());
+                    totalPatch[1][1] = atof(string(token[4]).c_str());
+                    totalPatch[1][2] = atof(string(token[5]).c_str());
 
-                    secondPoint[0] = atof(string(token[3]).c_str());
-                    secondPoint[1] = atof(string(token[4]).c_str());
-                    secondPoint[2] = atof(string(token[5]).c_str());
+                    totalPatch[2][0] = atof(string(token[6]).c_str());
+                    totalPatch[2][1] = atof(string(token[7]).c_str());
+                    totalPatch[2][2] = atof(string(token[8]).c_str());
 
-                    thirdPoint[0] = atof(string(token[6]).c_str());
-                    thirdPoint[1] = atof(string(token[7]).c_str());
-                    thirdPoint[2] = atof(string(token[8]).c_str());
+                    totalPatch[3][0] = atof(string(token[9]).c_str());
+                    totalPatch[3][1] = atof(string(token[10]).c_str());
+                    totalPatch[3][2] = atof(string(token[11]).c_str());
 
-                    fourthPoint[0] = atof(string(token[9]).c_str());
-                    fourthPoint[1] = atof(string(token[10]).c_str());
-                    fourthPoint[2] = atof(string(token[11]).c_str());
-                    totalPatch[0] = firstPoint;
-                    totalPatch[1] = secondPoint;
-                    totalPatch[2] = thirdPoint;
-                    totalPatch[3] = fourthPoint;
-                    //,secondPoint,thirdPoint,fourthPoint;
-                    if(patchNum == 0){
-                        patchOne = totalPatch;
-                    }
-                    else if(patchNum == 1){
-                        patchTwo = totalPatch;
-                    }
-                    else if(patchNum == 2){
-                        patchThree = totalPatch;
-                    }
-                    else if(patchNum == 3){
-                        patchFour = totalPatch;
-                    }
-
-                    patchNum += 1;
-                    if(patchNum >=4){ // CALCULATE SURFACE
-                        double pOne[4][3];
-                        double pTwo[4][3];
-                        double pThree[4][3];
-                        double pFour[4][3];
-                        for(int i = 0; i < 4; i++){
-                            for(int j = 0; j < 3; j++){
-                                pOne[i][j] = patchOne[i][j];
-                                pTwo[i][j] = patchTwo[i][j];
-                                pThree[i][j] = patchThree[i][j];
-                                pFour[i][j] = patchFour[i][j];
+                    if(patchNum[0] == 0){
+                        for(int i = 0; i < 4; i ++){
+                            for (int j = 0; j < 4; j++){
+                                patchOne[i][j] =  totalPatch[i][j];
                             }
                         }
-                        Surface sur = Surface(pOne,pTwo,pThree,pFour);
+                        //cout << patchNum[0] << endl;
+                    }
+                    else if(patchNum[0] == 1){
+                        for(int i = 0; i < 4; i ++){
+                            for (int j = 0; j < 4; j++){
+                                patchTwo[i][j] =  totalPatch[i][j];
+                            }
+                        }                    
+                    }
+                    else if(patchNum[0] == 2){
+                        for(int i = 0; i < 4; i ++){
+                            for (int j = 0; j < 4; j++){
+                                //cout << patchNum << endl;
+                                patchThree[i][j] =  totalPatch[i][j];
+                            }
+                        }
+                    }
+                    else if(patchNum[0] == 3){
+                        for(int i = 0; i < 4; i ++){
+                            for (int j = 0; j < 4; j++){
+
+                                patchFour[i][j] =  totalPatch[i][j];
+                            }
+                        }
+                    }
+                    //cout << patchNum << endl;
+
+                    patchNum[0]+=1;
+                    if(patchNum[0] >=4){ // CALCULATE SURFACE
+
+                        Surface sur = Surface(patchOne,patchTwo,patchThree,patchFour);
                         surfaces.push_back(sur);
                         //curSurface.clear();
-                        patchNum = 0;
+                        patchNum[0] = 0;
                     }
 
                 }
                 lineNumber+=1;
-                cout << lineNumber << endl;
             } // end of if(token[0])
-            cout << "new line" << endl;
+
+
         } // end of while(!myFile.eof())
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
@@ -849,37 +854,38 @@ int main(int argc, char *argv[]) {
         surfaces.clear();
 
     } // end of parsing 
+    cout << "END OF PARSING. ALL" << endl;
 
 
-    
-//This initializes glut
-glutInit(&argc, argv);
-//This tells glut to use a double-buffered window with red, green, and blue channels 
 
-glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    //This initializes glut
+    glutInit(&argc, argv);
+    //This tells glut to use a double-buffered window with red, green, and blue channels 
 
-// Initalize theviewport size
-viewport.w = 400;
-viewport.h = 400;
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-//The size and position of the window
-glutInitWindowSize(viewport.w, viewport.h);
-glutInitWindowPosition(0,0);
-glutCreateWindow(argv[0]);
+    // Initalize theviewport size
+    viewport.w = 400;
+    viewport.h = 400;
 
-initScene();                            // quick function to set up scene
+    //The size and position of the window
+    glutInitWindowSize(viewport.w, viewport.h);
+    glutInitWindowPosition(0,0);
+    glutCreateWindow(argv[0]);
 
-glutDisplayFunc(myDisplay);             // function to run when its time to draw something
-glutReshapeFunc(myReshape);             // function to run when the window gets resized
-glutKeyboardFunc(myKey);
-glutSpecialFunc(specialKey);
-glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
-glDepthFunc(GL_LEQUAL);
-glutMainLoop();                         // infinite loop that will keep drawing and resizing
-// and whatever else
+    initScene();                            // quick function to set up scene
+
+    glutDisplayFunc(myDisplay);             // function to run when its time to draw something
+    glutReshapeFunc(myReshape);             // function to run when the window gets resized
+    glutKeyboardFunc(myKey);
+    glutSpecialFunc(specialKey);
+    glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
+    glDepthFunc(GL_LEQUAL);
+    glutMainLoop();                         // infinite loop that will keep drawing and resizing
+    // and whatever else
 
 
-return 0;
+    return 0;
 }
 
 

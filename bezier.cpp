@@ -665,6 +665,7 @@ int main(int argc, char *argv[]) {
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else
 

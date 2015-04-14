@@ -104,6 +104,7 @@ void myDisplay() {
 
 
     for (int i=0; i<polygons.size(); i++) {
+        //cout << "entering myDIsplay's forLoop" << endl;
         Polygon* temp = polygons[i];
         if (temp->id == currID) {
             glColor3f(1.0f, 1.0f, 0.0f);
@@ -112,6 +113,7 @@ void myDisplay() {
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
+        cout << "hi" << endl;
         for (int j=0; j<verTemp.size(); j++) {
             Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
             Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
@@ -764,12 +766,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                //cout << lineNumber << endl;
-                //string second = string(token[1]).c_str();
-                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
-
-                //int check = strcmp(first," ")
-                //cout << check << endl;
+                //cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -777,7 +774,7 @@ int main(int argc, char *argv[]) {
                     double totalPatch[4][3];
                     totalPatch[0][0] = atof(string(token[0]).c_str());
                     totalPatch[0][1] = atof(string(token[1]).c_str());
-                    cout << "second item: " << totalPatch[0][1] << endl;
+                    //cout << "second item: " << totalPatch[0][1] << endl;
                     totalPatch[0][2] = atof(string(token[2]).c_str());
 
                     totalPatch[1][0] = atof(string(token[3]).c_str());

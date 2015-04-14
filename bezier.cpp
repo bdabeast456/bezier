@@ -164,7 +164,7 @@ void findCenterPoint(int idCheck){
     int iterationCount = 1;
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
-        if(polygon.id == idCheck){
+        if(polygon.id[0] == idCheck){
             for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
                 Vector4 vertex = *vert; 
                 if(iterationCount == 1){ // first iteration

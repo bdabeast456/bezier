@@ -104,14 +104,14 @@ void myDisplay() {
 
 
     for (int i=0; i<polygons.size(); i++) {
-        Polygon temp = polygons[i];
-        if (temp.id == currID) {
+        Polygon* temp = polygons[i];
+        if (temp->id == currID) {
             glColor3f(1.0f, 1.0f, 0.0f);
         } else {
             glColor3f(1.0f, 0.0f, 1.0f);
         }
         glBegin(GL_POLYGON);
-        vector<double> verTemp = temp.vertices;
+        vector<double> verTemp = temp->vertices;
         for (int j=0; j<verTemp.size(); j++) {
             glVertex3f(verTemp[j].xc(), verTemp.yc(), verTemp.zc());
         }

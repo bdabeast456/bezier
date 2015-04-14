@@ -129,11 +129,7 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
     * Tells if errorBound is larger than the distance between points.
     */
-<<<<<<< HEAD
-    if (errorBound > sqr(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
-=======
     if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
->>>>>>> b2448d4058d0952b4f47fb4fa4ff39c3cbb21a61
         return true;
     } else { 
         return false;

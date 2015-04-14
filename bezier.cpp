@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <vector>
 #include <cmath>
+#include <string.h>
 
 #include "bezier_util.h"
 
@@ -669,10 +670,38 @@ int main(int argc, char *argv[]) {
     /*
      * INSERT PARSER HERE
      */
+    string readFile;
     if (argc == 1) {
        cout << "No input file specified.";
        exit(0);
     }
+    //#include <string.h>
+    for (int i=1; i<argc; i++) {
+        string arg;
+        arg = string(argv[i]);
+        if(strlen(arg.c_str()) >= 4){
+            string last4 = arg.substr(strlen(arg.c_str())-4,string::npos);
+            if(last4 == ".bez"){
+                cout << "wow .bez file found!" << endl;
+                readFile = arg;       
+            }
+        }
+        /*if (arg=="input") {
+            readFile = string(argv[i+1]);
+            i++;
+            continue;
+        }
+        if (arg=="write_img") {
+            out = string(argv[i+1]);
+            i++;
+            continue;
+        }*/
+        else {
+            std::cout << "Unrecognized argument. Please review usage." << std::endl;
+            exit(0);
+        }
+    }
+
     if (!tessellationStrat) {
         for (int i=0; i<surfaces.size(); i++) {
                tessellate(surfaces[i]);

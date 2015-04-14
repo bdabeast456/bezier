@@ -113,7 +113,7 @@ void myDisplay() {
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
         for (int j=0; j<verTemp.size(); j++) {
-            glVertex3f(verTemp[j].xc(), verTemp.yc(), verTemp.zc());
+            glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }
         glEnd();
     }

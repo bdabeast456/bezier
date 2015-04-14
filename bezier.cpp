@@ -172,11 +172,17 @@ void findCenterPoint(int idCheck){
      */
     vector<double> center;
     int iterationCount = 1;
-    for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
-        Polygon polygon = **poly;
+    //for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
+    for(int polygonCount = 0; polygonCount < numSurfaces*4;polygonCount++){
+        //cout << "start" << endl;
+        Polygon polygon = *(polygons[polygonCount]);//**poly;
+        //cout << "continue" << endl;
         if(polygon.id[0] == idCheck){
-            for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
-                Vector4 vertex = *vert; 
+            //for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
+            //cout << "NEW POLYGON VERTEX CHECK" << endl;
+            for(int count = 0; count < 4; count++){
+                Vector4 vertex = polygon.vertices[count];
+                //cout << iterationCount << endl;
                 if(iterationCount == 1){ // first iteration
                     center.push_back(vertex.xc());
                     center.push_back(vertex.yc());
@@ -187,11 +193,13 @@ void findCenterPoint(int idCheck){
                     center[1] = center[1] + vertex.yc();
                     center[2] = center[2] + vertex.zc();
                 }
+                //cout << "finished" << endl;
                 iterationCount = iterationCount+1;
             }
         }
 
     }
+    //cout << "MEOW" << endl;
     center[0] = center[0] / (polygons.size()*4); // divide by # vertices
     center[1] = center[1] / (polygons.size()*4);
     center[2] = center[2] / (polygons.size()*4);
@@ -785,7 +793,7 @@ int main(int argc, char *argv[]) {
 
                 string first = string(token[0]).c_str();
                 cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
-                cout << "TEST" << endl;
+                //cout << "TEST" << endl;
 
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
@@ -810,7 +818,7 @@ int main(int argc, char *argv[]) {
 
                     if(patchNum[0] == 0){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
                                 patchOne[i][j] =  totalPatch[i][j];
                             }
                         }
@@ -818,14 +826,14 @@ int main(int argc, char *argv[]) {
                     }
                     else if(patchNum[0] == 1){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
                                 patchTwo[i][j] =  totalPatch[i][j];
                             }
                         }                    
                     }
                     else if(patchNum[0] == 2){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
                                 //cout << patchNum << endl;
                                 patchThree[i][j] =  totalPatch[i][j];
                             }
@@ -833,7 +841,7 @@ int main(int argc, char *argv[]) {
                     }
                     else if(patchNum[0] == 3){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
 
                                 patchFour[i][j] =  totalPatch[i][j];
                             }
@@ -854,7 +862,7 @@ int main(int argc, char *argv[]) {
         //cout << "got here"<< step << endl;
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
-                cout << "hi!"<< endl;
+                //cout << "hi!"<< endl;
                 tessellate(surfaces[i]);
             }
         } else {
@@ -885,7 +893,9 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+        cout << "out of if-else statement" << endl;
         findCenterPoint(currID);
+        cout << "found centerPoint" << endl;
         surfaces.clear();
 
     } // end of parsing 

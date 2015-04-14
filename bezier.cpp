@@ -91,7 +91,6 @@ void myReshape(int w, int h) {
 
 }
 
-
 //****************************************************
 // function that does the actual drawing of stuff
 //***************************************************
@@ -113,6 +112,11 @@ void myDisplay() {
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
         for (int j=0; j<verTemp.size(); j++) {
+            Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 crossP = v1.cross(v2);
+            crossP.unit()
+            glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }
         glEnd();
@@ -725,7 +729,7 @@ int main(int argc, char *argv[]) {
     glutReshapeFunc(myReshape);             // function to run when the window gets resized
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
     glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else

@@ -15,6 +15,9 @@ public:
     double zc();
     double wc();
     double dot4(Vector4 v);
+    void unit();
+    Vector4 sub(Vector4 v);
+    Vector4 cross(Vector4 v);
 private:
     double x;
     double y;

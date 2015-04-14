@@ -66,6 +66,31 @@ double Vector4::dot4(Vector4 v) {
     return x*v.xc() + y*v.yc() + z*v.zc() + w*v.wc();
 }
 
+void Vector4::unit() {
+    if (w == 1) {
+        x = x/w;
+        y = y/w;
+        z = z/w;
+        w = 1.0;
+        return;
+    } else {
+        double length = pow(x*x + y*y + z*z, .5);
+        x = x/length;
+        y = y/length;
+        z = z/length;
+        return;
+    }
+}
+
+Vector4 Vector4::sub(Vector4 v) {
+    Vector4 newV = Vector4(x-v.x(), y-v.y(), z-v.z(), 0);
+
+}
+
+Vector4 Vector4::cross(Vector4 v) {
+    return Vector4(y*v.zc()-z*v.yc(), -(x*v.zc()-z*v.xc()), x*v.yc()-y*v.xc(), 0);
+}
+
 Bezier::Bezier(double patch[][3]){
    /*
    * argument in the form of one = {{x,y,z},{x,y,z},{x,y,z},{x,y,z}};

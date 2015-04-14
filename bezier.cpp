@@ -98,7 +98,6 @@ void myReshape(int w, int h) {
 // function that does the actual drawing of stuff
 //***************************************************
 void myDisplay() {
-    //cout << "in myDisplay" << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);               // clear the color buffer
 
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
@@ -106,7 +105,6 @@ void myDisplay() {
     glScalef(zoom,zoom,zoom);
 
     for (int i=0; i<polygons.size(); i++) {
-        //cout << "entering myDIsplay's forLoop" << endl;
         Polygon* temp = polygons[i];
         if (temp->id[0] == currID) {
             glColor3f(1.0f, 0.5f, 0.0f);
@@ -115,7 +113,6 @@ void myDisplay() {
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
-        //cout << "hi" << endl;
         for (int j=0; j<verTemp.size(); j++) {
             Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
             Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
@@ -129,7 +126,6 @@ void myDisplay() {
 
     glFlush();
     glutSwapBuffers();                  // swap buffers (we earlier set double buffer)
-    //cout << "end of myDisplay" << endl;
 }
 
 bool distance(double x1, double y1, double z1, vector<double> coords) {
@@ -147,7 +143,6 @@ void transformPolygons(matrix m){
     /*
      * Applies the transformation m to points defining tessellated polygons.
      */
-    //cout << "gets here" << endl;
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
         vector<Vector4> newVertices;
@@ -156,9 +151,7 @@ void transformPolygons(matrix m){
             Vector4 newVertex = m.multiplyv(vertex);
             newVertices.push_back(newVertex);
         }
-        //cout << "newVertcies: " << newVertices[0].xc() << ", " << newVertices[0].yc() << ", " << newVertices[0].zc()  << endl;
         (**poly).vertices = newVertices;
-        //cout << "polygon After: " << polygon.vertices[0].xc() << ", " << polygon.vertices[0].yc() << ", " << polygon.vertices[0].zc()  << endl;
 
 
     }
@@ -187,7 +180,7 @@ void findCenterPoint(int idCheck){
                     center[1] = center[1] + vertex.yc();
                     center[2] = center[2] + vertex.zc();
                 }
-                iterationCount = iterationCount+1;
+                iterationCount++;
             }
         }
 
@@ -269,7 +262,6 @@ void specialKey(int key, int x, int y){
 
     }
     else if(key == GLUT_KEY_UP){
-        //cout << increment << endl;
         m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
         m.multiplym(matrix(rotIncrement,0,0,2));
         m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
@@ -706,7 +698,6 @@ int main(int argc, char *argv[]) {
     if(strlen(arg1.c_str()) >= 4){
         string last4 = arg1.substr(strlen(arg1.c_str())-4,string::npos);
         if(last4 == ".bez"){
-            //cout << "wow .bez file found!" << endl;
             readFile = arg1;
         }
         else{
@@ -789,7 +780,6 @@ int main(int argc, char *argv[]) {
                     numSurfaces = atof(string(token[0]).c_str());
                 }
                 else{
-                    cout << "probe" << endl;
                     double totalPatch[4][3];
                     totalPatch[0][0] = atof(string(token[0]).c_str());
                     totalPatch[0][1] = atof(string(token[1]).c_str());
@@ -806,33 +796,30 @@ int main(int argc, char *argv[]) {
                     totalPatch[3][0] = atof(string(token[9]).c_str());
                     totalPatch[3][1] = atof(string(token[10]).c_str());
                     totalPatch[3][2] = atof(string(token[11]).c_str());
-
                     if(patchNum[0] == 0){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
                                 patchOne[i][j] =  totalPatch[i][j];
                             }
                         }
-                        //cout << patchNum[0] << endl;
                     }
                     else if(patchNum[0] == 1){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
                                 patchTwo[i][j] =  totalPatch[i][j];
                             }
                         }                    
                     }
                     else if(patchNum[0] == 2){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
-                                //cout << patchNum << endl;
+                            for (int j = 0; j < 3; j++){
                                 patchThree[i][j] =  totalPatch[i][j];
                             }
                         }
                     }
                     else if(patchNum[0] == 3){
                         for(int i = 0; i < 4; i ++){
-                            for (int j = 0; j < 4; j++){
+                            for (int j = 0; j < 3; j++){
 
                                 patchFour[i][j] =  totalPatch[i][j];
                             }
@@ -850,10 +837,8 @@ int main(int argc, char *argv[]) {
                 lineNumber+=1;
             } // end of if(token[0])
         } // end of while(!myFile.eof())
-        cout << "Begin tessellation." << endl;
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
-                cout << "hi!"<< endl;
                 tessellate(surfaces[i]);
             }
         } else {
@@ -888,9 +873,6 @@ int main(int argc, char *argv[]) {
         surfaces.clear();
 
     } // end of parsing 
-    cout << "END OF PARSING." << endl;
-
-
 
     //This initializes glut
     glutInit(&argc, argv);
@@ -915,9 +897,7 @@ int main(int argc, char *argv[]) {
     glutSpecialFunc(specialKey);
     glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
     glDepthFunc(GL_LEQUAL);
-    //cout << "out of myDisplay" <<endl;
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
-    //cout << "mainLoop?" << endl;
     // and whatever else
 
 

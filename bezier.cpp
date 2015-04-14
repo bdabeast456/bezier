@@ -784,7 +784,12 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
+<<<<<<< HEAD
                 cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
+=======
+                            cout << "TEST" << endl;
+
+>>>>>>> 1116be2c7ad8bd56c1c0346b6b697392c02cccec
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -792,7 +797,6 @@ int main(int argc, char *argv[]) {
                     double totalPatch[4][3];
                     totalPatch[0][0] = atof(string(token[0]).c_str());
                     totalPatch[0][1] = atof(string(token[1]).c_str());
-                    //cout << "second item: " << totalPatch[0][1] << endl;
                     totalPatch[0][2] = atof(string(token[2]).c_str());
 
                     totalPatch[1][0] = atof(string(token[3]).c_str());
@@ -838,11 +842,16 @@ int main(int argc, char *argv[]) {
                             }
                         }
                     }
+<<<<<<< HEAD
                     //cout << patchNum << endl;
 
                     patchNum[0]+=1;
                     if(patchNum[0] >=4){ // CALCULATE SURFACE
 
+=======
+                    patchNum[0]+=1;
+                    if(patchNum[0] >=4){ // CALCULATE SURFACE
+>>>>>>> 1116be2c7ad8bd56c1c0346b6b697392c02cccec
                         Surface sur = Surface(patchOne,patchTwo,patchThree,patchFour);
                         surfaces.push_back(sur);
                         //curSurface.clear();
@@ -852,10 +861,11 @@ int main(int argc, char *argv[]) {
                 }
                 lineNumber+=1;
             } // end of if(token[0])
-
-
         } // end of while(!myFile.eof())
+<<<<<<< HEAD
         //cout << "got here"<< step << endl;
+=======
+>>>>>>> 1116be2c7ad8bd56c1c0346b6b697392c02cccec
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
                 cout << "hi!"<< endl;

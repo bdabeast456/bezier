@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <vector>
 #include <cmath>
+#include <string.h>
 
 #include "bezier_util.h"
 
@@ -128,8 +129,8 @@ void myDisplay() {
 
 bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
-    * Tells if errorBound is larger than the distance between points.
-    */
+     * Tells if errorBound is larger than the distance between points.
+     */
     if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
         return true;
     } else { 
@@ -139,8 +140,8 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
 
 void transformPolygons(matrix m){
     /*
-    * Applies the transformation m to points defining tessellated polygons.
-    */
+     * Applies the transformation m to points defining tessellated polygons.
+     */
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
         vector<Vector4> newVertices;
@@ -156,8 +157,8 @@ void transformPolygons(matrix m){
 
 void findCenterPoint(int idCheck){
     /*
-    * Calculates "center" of the shape represented by an input file.
-    */
+     * Calculates "center" of the shape represented by an input file.
+     */
     vector<double> center;
     int iterationCount = 1;
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
@@ -189,8 +190,8 @@ void findCenterPoint(int idCheck){
 
 void myKey(unsigned char key, int x, int y) {
     /*
-    * General input key handling.
-    */
+     * General input key handling.
+     */
     if(key==32) {
         exit(0);
     }
@@ -241,8 +242,8 @@ void myKey(unsigned char key, int x, int y) {
 
 void specialKey(int key, int x, int y){
     /*
-    * Shift and direction key handling.
-    */
+     * Shift and direction key handling.
+     */
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         m = matrix(0,increment, 0 , 0);
@@ -312,14 +313,14 @@ void specialKey(int key, int x, int y){
 
 void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<double> > uvcoords) {
     /*
-    * Recursive routine for adaptive tessellation.
-    */
+     * Recursive routine for adaptive tessellation.
+     */
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
-                       (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
+            (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
-                       (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
+            (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
-                       (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+            (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
     if (e1 && e2 && e3) {
         Polygon  newPol = Polygon(realcoords, currID);
         Polygon* newPoly = &(newPol);
@@ -551,8 +552,8 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
 
 void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
-    * Starting routine for adaptive tessellation.
-    */
+     * Starting routine for adaptive tessellation.
+     */
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> pt1uv;
     pt1uv.push_back(u);
@@ -591,8 +592,8 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
 
 void tessellate(Surface s) {
     /*
-    * Perform uniform tessellation on Surface s. Step is specified as a global variable.
-    */
+     * Perform uniform tessellation on Surface s. Step is specified as a global variable.
+     */
     int steps = (int)(1/step);
     for (int vb=0; vb<steps; vb++) {
         double v = (double)(vb*step);
@@ -670,71 +671,207 @@ int main(int argc, char *argv[]) {
     /*
      * INSERT PARSER HERE
      */
-    if (argc == 1) {
-       cout << "No input file specified.";
-       exit(0);
+    const int MAX_CHARS_PER_LINE = 512;
+    const int MAX_TOKENS_PER_LINE = 17;
+    const char* const DELIMITER = " ";
+
+    string readFile;
+    if (argc < 2) {
+        cout << "No input file or step size specified.";
+        exit(0);
     }
-    if (!tessellationStrat) {
-        for (int i=0; i<surfaces.size(); i++) {
-               tessellate(surfaces[i]);
+    //#include <string.h>
+    //for (int i=1; i<argc; i++) {
+    string arg1 = string(argv[1]);
+    string arg2 = string(argv[2]);
+    if(strlen(arg1.c_str()) >= 4){
+        string last4 = arg1.substr(strlen(arg1.c_str())-4,string::npos);
+        if(last4 == ".bez"){
+            cout << "wow .bez file found!" << endl;
+            readFile = arg1;
         }
-    } else {
-        int steps = (int)(1/step);
-        for (int s=0; s<surfaces.size(); s++) {
-            for (int vb=0; vb<steps; vb++) {
-                double v = (double)(vb*step);
-                double vend = v+step;
-                for (int ub=0; ub<steps; ub++) {
-                    double u = (double)(ub*step);
-                    adaptTessellate(surfaces[s], u, v, u+step, vend);
+        else{
+            cout << "input file not in .bez format" << endl;
+            exit(0);
+        }
+    }
+
+    double possibleStep = atof(string(arg2).c_str());
+    if(argc == 3){ // uniform
+        step = possibleStep;
+
+    }
+    else if(argc > 3 && string(argv[3]) == "-a"){
+        errorBound = possibleStep;
+        tessellationStrat = 1;
+    }
+    else {
+        std::cout << "Unrecognized argument. Please review usage." << std::endl;
+        exit(0);
+    }
+    //start parsing readFile
+    ifstream myFile;
+    myFile.open(readFile);
+    if(readFile == ""){
+        cout << "No input provided. Please review usage." << std::endl;
+        exit(0);
+    }
+    else{
+        int lineNumber= 1;
+        int patchNum = 0; // when == 4, parse current set of patches into surfaces
+        double **patchOne;
+        double **patchTwo;
+        double **patchThree;
+        double **patchFour;
+        cout << "Parsing BEZ file" << endl;
+        while (!myFile.eof()){
+            char buf[MAX_CHARS_PER_LINE];
+            myFile.getline(buf, MAX_CHARS_PER_LINE);
+            const char* token[MAX_TOKENS_PER_LINE] = {}; 
+            token[0] = strtok(buf, DELIMITER); // first token
+            if (token[0]){
+                int length = 0;
+                for (int n = 1; n < MAX_TOKENS_PER_LINE; n++) {
+                    token[n] = strtok(0,DELIMITER);
+                    length +=1;
+                    if (!token[n]){
+                        break;
+                    }
                 }
+                //string first = string(token[0]).c_str();
+                if(lineNumber == 1){
+                    numSurfaces = atof(string(token[0]).c_str());
+                }
+                else{
+
+                    double firstPoint[3];
+                    double secondPoint[3];
+                    double thirdPoint[3];
+                    double fourthPoint[3];
+                    double **totalPatch;
+                    firstPoint[0] = atof(string(token[0]).c_str());
+                    firstPoint[1] = atof(string(token[1]).c_str());
+                    firstPoint[2] = atof(string(token[2]).c_str());
+
+                    secondPoint[0] = atof(string(token[3]).c_str());
+                    secondPoint[1] = atof(string(token[4]).c_str());
+                    secondPoint[2] = atof(string(token[5]).c_str());
+
+                    thirdPoint[0] = atof(string(token[6]).c_str());
+                    thirdPoint[1] = atof(string(token[7]).c_str());
+                    thirdPoint[2] = atof(string(token[8]).c_str());
+
+                    fourthPoint[0] = atof(string(token[9]).c_str());
+                    fourthPoint[1] = atof(string(token[10]).c_str());
+                    fourthPoint[2] = atof(string(token[11]).c_str());
+                    totalPatch[0] = firstPoint;
+                    totalPatch[1] = secondPoint;
+                    totalPatch[2] = thirdPoint;
+                    totalPatch[3] = fourthPoint;
+                    //,secondPoint,thirdPoint,fourthPoint;
+                    if(patchNum == 0){
+                        patchOne = totalPatch;
+                    }
+                    else if(patchNum == 1){
+                        patchTwo = totalPatch;
+                    }
+                    else if(patchNum == 2){
+                        patchThree = totalPatch;
+                    }
+                    else if(patchNum == 3){
+                        patchFour = totalPatch;
+                    }
+
+                    patchNum += 1;
+                    if(patchNum >=4){ // CALCULATE SURFACE
+                        double pOne[4][3];
+                        double pTwo[4][3];
+                        double pThree[4][3];
+                        double pFour[4][3];
+                        for(int i = 0; i < 4; i++){
+                            for(int j = 0; j < 3; j++){
+                                pOne[i][j] = patchOne[i][j];
+                                pTwo[i][j] = patchTwo[i][j];
+                                pThree[i][j] = patchThree[i][j];
+                                pFour[i][j] = patchFour[i][j];
+                            }
+                        }
+                        Surface sur = Surface(pOne,pTwo,pThree,pFour);
+                        surfaces.push_back(sur);
+                        //curSurface.clear();
+                        patchNum = 0;
+                    }
+
+                }
+                lineNumber+=1;
+            } // end of if(token[0])
+        } // end of while(!myFile.eof())
+        if (!tessellationStrat) {
+            for (int i=0; i<surfaces.size(); i++) {
+                tessellate(surfaces[i]);
             }
-            //Cleanup if necessary.
-            if (1-(steps*step) > .0000001) {
-                double v = (double)(steps*step);
-                for (int ub=0; ub<steps; ub++) {
-                    double u = (double)(ub*step);
-                    adaptTessellate(surfaces[s], u, v, u+step, 1);
-                }
-                double u = (double)(steps*step);
+        } else {
+            int steps = (int)(1/step);
+            for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {
-                    v = (double)(vb*step);
-                    adaptTessellate(surfaces[s], u, v, 1, v+step);
+                    double v = (double)(vb*step);
+                    double vend = v+step;
+                    for (int ub=0; ub<steps; ub++) {
+                        double u = (double)(ub*step);
+                        adaptTessellate(surfaces[s], u, v, u+step, vend);
+                    }
                 }
-                v = steps*step;
-                adaptTessellate(surfaces[s], u, v, 1, 1);   
+                //Cleanup if necessary.
+                if (1-(steps*step) > .0000001) {
+                    double v = (double)(steps*step);
+                    for (int ub=0; ub<steps; ub++) {
+                        double u = (double)(ub*step);
+                        adaptTessellate(surfaces[s], u, v, u+step, 1);
+                    }
+                    double u = (double)(steps*step);
+                    for (int vb=0; vb<steps; vb++) {
+                        v = (double)(vb*step);
+                        adaptTessellate(surfaces[s], u, v, 1, v+step);
+                    }
+                    v = steps*step;
+                    adaptTessellate(surfaces[s], u, v, 1, 1);   
+                }
             }
         }
-    }
 
-    //This initializes glut
-    glutInit(&argc, argv);
-    //This tells glut to use a double-buffered window with red, green, and blue channels 
-    std::cout << "Have " << argc << " arguments:" << std::endl;
+    } // end of parsing 
 
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-    // Initalize theviewport size
-    viewport.w = 400;
-    viewport.h = 400;
+    
+//This initializes glut
+glutInit(&argc, argv);
+//This tells glut to use a double-buffered window with red, green, and blue channels 
+std::cout << "Have " << argc << " arguments:" << std::endl;
 
-    //The size and position of the window
-    glutInitWindowSize(viewport.w, viewport.h);
-    glutInitWindowPosition(0,0);
-    glutCreateWindow(argv[0]);
+glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-    initScene();                            // quick function to set up scene
+// Initalize theviewport size
+viewport.w = 400;
+viewport.h = 400;
 
-    glutDisplayFunc(myDisplay);             // function to run when its time to draw something
-    glutReshapeFunc(myReshape);             // function to run when the window gets resized
-    glutKeyboardFunc(myKey);
-    glutSpecialFunc(specialKey);
-    glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
-    glDepthFunc(GL_LEQUAL);
-    glutMainLoop();                         // infinite loop that will keep drawing and resizing
-    // and whatever else
+//The size and position of the window
+glutInitWindowSize(viewport.w, viewport.h);
+glutInitWindowPosition(0,0);
+glutCreateWindow(argv[0]);
 
-    return 0;
+initScene();                            // quick function to set up scene
+
+glutDisplayFunc(myDisplay);             // function to run when its time to draw something
+glutReshapeFunc(myReshape);             // function to run when the window gets resized
+glutKeyboardFunc(myKey);
+glutSpecialFunc(specialKey);
+glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
+glDepthFunc(GL_LEQUAL);
+glutMainLoop();                         // infinite loop that will keep drawing and resizing
+// and whatever else
+
+
+return 0;
 }
 
 

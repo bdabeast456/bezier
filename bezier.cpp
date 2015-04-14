@@ -783,8 +783,6 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                            cout << "TEST" << endl;
-
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -849,6 +847,7 @@ int main(int argc, char *argv[]) {
                 lineNumber+=1;
             } // end of if(token[0])
         } // end of while(!myFile.eof())
+        cout << "Begin tessellation." << endl;
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
                 tessellate(surfaces[i]);

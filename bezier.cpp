@@ -124,8 +124,8 @@ void myDisplay() {
 
 bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
-    * Tells if errorBound is larger than the distance between points.
-    */
+     * Tells if errorBound is larger than the distance between points.
+     */
     if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
         return true;
     } else { 
@@ -135,8 +135,8 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
 
 void transformPolygons(matrix m){
     /*
-    * Applies the transformation m to points defining tessellated polygons.
-    */
+     * Applies the transformation m to points defining tessellated polygons.
+     */
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
         vector<Vector4> newVertices;
@@ -152,8 +152,8 @@ void transformPolygons(matrix m){
 
 void findCenterPoint(int idCheck){
     /*
-    * Calculates "center" of the shape represented by an input file.
-    */
+     * Calculates "center" of the shape represented by an input file.
+     */
     vector<double> center;
     int iterationCount = 1;
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
@@ -185,8 +185,8 @@ void findCenterPoint(int idCheck){
 
 void myKey(unsigned char key, int x, int y) {
     /*
-    * General input key handling.
-    */
+     * General input key handling.
+     */
     if(key==32) {
         exit(0);
     }
@@ -237,8 +237,8 @@ void myKey(unsigned char key, int x, int y) {
 
 void specialKey(int key, int x, int y){
     /*
-    * Shift and direction key handling.
-    */
+     * Shift and direction key handling.
+     */
     matrix m;
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_UP){
         m = matrix(0,increment, 0 , 0);
@@ -308,14 +308,14 @@ void specialKey(int key, int x, int y){
 
 void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<double> > uvcoords) {
     /*
-    * Recursive routine for adaptive tessellation.
-    */
+     * Recursive routine for adaptive tessellation.
+     */
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
-                       (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
+            (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
-                       (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
+            (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
-                       (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+            (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
     if (e1 && e2 && e3) {
         Polygon  newPol = Polygon(realcoords, currID);
         Polygon* newPoly = &(newPol);
@@ -547,8 +547,8 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
 
 void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
-    * Starting routine for adaptive tessellation.
-    */
+     * Starting routine for adaptive tessellation.
+     */
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> pt1uv;
     pt1uv.push_back(u);
@@ -587,8 +587,8 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
 
 void tessellate(Surface s) {
     /*
-    * Perform uniform tessellation on Surface s. Step is specified as a global variable.
-    */
+     * Perform uniform tessellation on Surface s. Step is specified as a global variable.
+     */
     int steps = (int)(1/step);
     for (int vb=0; vb<steps; vb++) {
         double v = (double)(vb*step);
@@ -667,40 +667,41 @@ int main(int argc, char *argv[]) {
      * INSERT PARSER HERE
      */
     string readFile;
-    if (argc == 1) {
-       cout << "No input file specified.";
-       exit(0);
+    if (argc < 2) {
+        cout << "No input file or step size specified.";
+        exit(0);
     }
     //#include <string.h>
-    for (int i=1; i<argc; i++) {
-        string arg;
-        arg = string(argv[i]);
-        if(strlen(arg.c_str()) >= 4){
-            string last4 = arg.substr(strlen(arg.c_str())-4,string::npos);
-            if(last4 == ".bez"){
-                cout << "wow .bez file found!" << endl;
-                readFile = arg;       
-            }
-        }
-        /*if (arg=="input") {
-            readFile = string(argv[i+1]);
-            i++;
-            continue;
-        }
-        if (arg=="write_img") {
-            out = string(argv[i+1]);
-            i++;
-            continue;
-        }*/
-        else {
-            std::cout << "Unrecognized argument. Please review usage." << std::endl;
-            exit(0);
+    //for (int i=1; i<argc; i++) {
+    string arg;
+    arg1 = string(argv[1]);
+    arg2 = string(argv[2]);
+    if(strlen(arg.c_str()) >= 4){
+        string last4 = arg.substr(strlen(arg.c_str())-4,string::npos);
+        if(last4 == ".bez"){
+            cout << "wow .bez file found!" << endl;
+            readFile = arg;
+            continue;       
         }
     }
 
+    double possibleStep = atof(string(arg2).c_str());
+    if(argc == 3){ // uniform
+        step = possibleStep;
+    }
+    else if(argc > 3 && string(argv[3]) == "-a"){
+         errorBound = possibleStep;
+    }
+
+    else {
+        std::cout << "Unrecognized argument. Please review usage." << std::endl;
+        exit(0);
+    }
+
+
     if (!tessellationStrat) {
         for (int i=0; i<surfaces.size(); i++) {
-               tessellate(surfaces[i]);
+            tessellate(surfaces[i]);
         }
     } else {
         int steps = (int)(1/step);

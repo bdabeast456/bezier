@@ -117,8 +117,8 @@ void myDisplay() {
         vector<Vector4> verTemp = temp->vertices;
         //cout << "hi" << endl;
         for (int j=0; j<verTemp.size(); j++) {
-            Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-            Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
             Vector4 crossP = v1.cross(v2);
             crossP.unit();
             glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
@@ -717,6 +717,7 @@ int main(int argc, char *argv[]) {
 
     double possibleStep = atof(string(arg2).c_str());
     if(argc == 3){ // uniform
+        //cout << possibleStep << endl;
         step = possibleStep;
 
     }
@@ -783,6 +784,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
+                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -850,6 +852,7 @@ int main(int argc, char *argv[]) {
         cout << "Begin tessellation." << endl;
         if (!tessellationStrat) {
             for (int i=0; i<surfaces.size(); i++) {
+                cout << "hi!"<< endl;
                 tessellate(surfaces[i]);
             }
         } else {

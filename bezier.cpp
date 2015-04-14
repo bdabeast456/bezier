@@ -116,7 +116,7 @@ void myDisplay() {
             Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
             Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
             Vector4 crossP = v1.cross(v2);
-            crossP.unit()
+            crossP.unit();
             glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }

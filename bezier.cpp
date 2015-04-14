@@ -105,13 +105,8 @@ void myDisplay() {
 
 
     for (int i=0; i<polygons.size(); i++) {
-<<<<<<< HEAD
-        Polygon temp = *(polygons[i]);
-        if (temp.id == currID) {
-=======
         Polygon* temp = polygons[i];
         if (temp->id == currID) {
->>>>>>> 1d13ca714f4871306c34a40723a68d8352e38a0d
             glColor3f(1.0f, 1.0f, 0.0f);
         } else {
             glColor3f(1.0f, 0.0f, 1.0f);
@@ -672,6 +667,10 @@ int main(int argc, char *argv[]) {
     /*
      * INSERT PARSER HERE
      */
+    const int MAX_CHARS_PER_LINE = 512;
+    const int MAX_TOKENS_PER_LINE = 17;
+    const char* const DELIMITER = " ";
+
     string readFile;
     if (argc < 2) {
         cout << "No input file or step size specified.";
@@ -696,9 +695,11 @@ int main(int argc, char *argv[]) {
     double possibleStep = atof(string(arg2).c_str());
     if(argc == 3){ // uniform
         step = possibleStep;
+
     }
     else if(argc > 3 && string(argv[3]) == "-a"){
-         errorBound = possibleStep;
+        errorBound = possibleStep;
+        tessellationStrat = 1;
     }
     else {
         std::cout << "Unrecognized argument. Please review usage." << std::endl;
@@ -712,74 +713,160 @@ int main(int argc, char *argv[]) {
         exit(0);
     }
     else{
+        int lineNumber= 1;
+        int patchNum = 0; // when == 4, parse current set of patches into surfaces
+        double **patchOne;
+        double **patchTwo;
+        double **patchThree;
+        double **patchFour;
         cout << "Parsing BEZ file" << endl;
         while (!myFile.eof()){
+            char buf[MAX_CHARS_PER_LINE];
+            myFile.getline(buf, MAX_CHARS_PER_LINE);
+            const char* token[MAX_TOKENS_PER_LINE] = {}; 
+            token[0] = strtok(buf, DELIMITER); // first token
+            if (token[0]){
+                int length = 0;
+                for (int n = 1; n < MAX_TOKENS_PER_LINE; n++) {
+                    token[n] = strtok(0,DELIMITER);
+                    length +=1;
+                    if (!token[n]){
+                        break;
+                    }
+                }
+                //string first = string(token[0]).c_str();
+                if(lineNumber == 1){
+                    numSurfaces = atof(string(token[0]).c_str());
+                }
+                else{
+
+                    double firstPoint[3];
+                    double secondPoint[3];
+                    double thirdPoint[3];
+                    double fourthPoint[3];
+                    double **totalPatch;
+                    firstPoint[0] = atof(string(token[0]).c_str());
+                    firstPoint[1] = atof(string(token[1]).c_str());
+                    firstPoint[2] = atof(string(token[2]).c_str());
+
+                    secondPoint[0] = atof(string(token[3]).c_str());
+                    secondPoint[1] = atof(string(token[4]).c_str());
+                    secondPoint[2] = atof(string(token[5]).c_str());
+
+                    thirdPoint[0] = atof(string(token[6]).c_str());
+                    thirdPoint[1] = atof(string(token[7]).c_str());
+                    thirdPoint[2] = atof(string(token[8]).c_str());
+
+                    fourthPoint[0] = atof(string(token[9]).c_str());
+                    fourthPoint[1] = atof(string(token[10]).c_str());
+                    fourthPoint[2] = atof(string(token[11]).c_str());
+                    totalPatch[0] = firstPoint;
+                    totalPatch[1] = secondPoint;
+                    totalPatch[2] = thirdPoint;
+                    totalPatch[3] = fourthPoint;
+                    //,secondPoint,thirdPoint,fourthPoint;
+                    if(patchNum == 0){
+                        patchOne = totalPatch;
+                    }
+                    else if(patchNum == 1){
+                        patchTwo = totalPatch;
+                    }
+                    else if(patchNum == 2){
+                        patchThree = totalPatch;
+                    }
+                    else if(patchNum == 3){
+                        patchFour = totalPatch;
+                    }
+
+                    patchNum += 1;
+                    if(patchNum >=4){ // CALCULATE SURFACE
+                        double pOne[4][3];
+                        double pTwo[4][3];
+                        double pThree[4][3];
+                        double pFour[4][3];
+                        for(int i = 0; i < 4; i++){
+                            for(int j = 0; j < 3; j++){
+                                pOne[i][j] = patchOne[i][j];
+                                pTwo[i][j] = patchTwo[i][j];
+                                pThree[i][j] = patchThree[i][j];
+                                pFour[i][j] = patchFour[i][j];
+                            }
+                        }
+                        Surface sur = Surface(pOne,pTwo,pThree,pFour);
+                        surfaces.push_back(sur);
+                        //curSurface.clear();
+                        patchNum = 0;
+                    }
+
+                }
+                lineNumber+=1;
+            } // end of if(token[0])
+        } // end of while(!myFile.eof())
+        if (!tessellationStrat) {
+            for (int i=0; i<surfaces.size(); i++) {
+                tessellate(surfaces[i]);
+            }
+        } else {
+            int steps = (int)(1/step);
+            for (int s=0; s<surfaces.size(); s++) {
+                for (int vb=0; vb<steps; vb++) {
+                    double v = (double)(vb*step);
+                    double vend = v+step;
+                    for (int ub=0; ub<steps; ub++) {
+                        double u = (double)(ub*step);
+                        adaptTessellate(surfaces[s], u, v, u+step, vend);
+                    }
+                }
+                //Cleanup if necessary.
+                if (1-(steps*step) > .0000001) {
+                    double v = (double)(steps*step);
+                    for (int ub=0; ub<steps; ub++) {
+                        double u = (double)(ub*step);
+                        adaptTessellate(surfaces[s], u, v, u+step, 1);
+                    }
+                    double u = (double)(steps*step);
+                    for (int vb=0; vb<steps; vb++) {
+                        v = (double)(vb*step);
+                        adaptTessellate(surfaces[s], u, v, 1, v+step);
+                    }
+                    v = steps*step;
+                    adaptTessellate(surfaces[s], u, v, 1, 1);   
+                }
+            }
         }
-    }
+
+    } // end of parsing 
+
 
     
+//This initializes glut
+glutInit(&argc, argv);
+//This tells glut to use a double-buffered window with red, green, and blue channels 
+std::cout << "Have " << argc << " arguments:" << std::endl;
 
-    if (!tessellationStrat) {
-        for (int i=0; i<surfaces.size(); i++) {
-            tessellate(surfaces[i]);
-        }
-    } else {
-        int steps = (int)(1/step);
-        for (int s=0; s<surfaces.size(); s++) {
-            for (int vb=0; vb<steps; vb++) {
-                double v = (double)(vb*step);
-                double vend = v+step;
-                for (int ub=0; ub<steps; ub++) {
-                    double u = (double)(ub*step);
-                    adaptTessellate(surfaces[s], u, v, u+step, vend);
-                }
-            }
-            //Cleanup if necessary.
-            if (1-(steps*step) > .0000001) {
-                double v = (double)(steps*step);
-                for (int ub=0; ub<steps; ub++) {
-                    double u = (double)(ub*step);
-                    adaptTessellate(surfaces[s], u, v, u+step, 1);
-                }
-                double u = (double)(steps*step);
-                for (int vb=0; vb<steps; vb++) {
-                    v = (double)(vb*step);
-                    adaptTessellate(surfaces[s], u, v, 1, v+step);
-                }
-                v = steps*step;
-                adaptTessellate(surfaces[s], u, v, 1, 1);   
-            }
-        }
-    }
+glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-    //This initializes glut
-    glutInit(&argc, argv);
-    //This tells glut to use a double-buffered window with red, green, and blue channels 
-    std::cout << "Have " << argc << " arguments:" << std::endl;
+// Initalize theviewport size
+viewport.w = 400;
+viewport.h = 400;
 
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+//The size and position of the window
+glutInitWindowSize(viewport.w, viewport.h);
+glutInitWindowPosition(0,0);
+glutCreateWindow(argv[0]);
 
-    // Initalize theviewport size
-    viewport.w = 400;
-    viewport.h = 400;
+initScene();                            // quick function to set up scene
 
-    //The size and position of the window
-    glutInitWindowSize(viewport.w, viewport.h);
-    glutInitWindowPosition(0,0);
-    glutCreateWindow(argv[0]);
+glutDisplayFunc(myDisplay);             // function to run when its time to draw something
+glutReshapeFunc(myReshape);             // function to run when the window gets resized
+glutKeyboardFunc(myKey);
+glutSpecialFunc(specialKey);
+glEnable(GL_DEPTH_TEST);
+glDepthFunc(GL_LEQUAL);
+glutMainLoop();                         // infinite loop that will keep drawing and resizing
+// and whatever else
 
-    initScene();                            // quick function to set up scene
-
-    glutDisplayFunc(myDisplay);             // function to run when its time to draw something
-    glutReshapeFunc(myReshape);             // function to run when the window gets resized
-    glutKeyboardFunc(myKey);
-    glutSpecialFunc(specialKey);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glutMainLoop();                         // infinite loop that will keep drawing and resizing
-    // and whatever else
-
-    return 0;
+return 0;
 }
 
 

@@ -197,7 +197,6 @@ void myKey(unsigned char key, int x, int y) {
     }
 
     if(key == 115){ // 's' toggle between flat and smooth
-        //cout << flatShading << endl;
         if(flatShading == true){
             flatShading = false;
             glShadeModel(GL_SMOOTH);
@@ -677,7 +676,7 @@ int main(int argc, char *argv[]) {
 
     string readFile;
     if (argc < 2) {
-        cout << "No input file or step size specified.";
+        cout << "No input file or step size specified." << endl;
         exit(0);
     }
     //#include <string.h>
@@ -706,14 +705,14 @@ int main(int argc, char *argv[]) {
         tessellationStrat = 1;
     }
     else {
-        std::cout << "Unrecognized argument. Please review usage." << std::endl;
+        cout << "Unrecognized argument. Please review usage." << endl;
         exit(0);
     }
     //start parsing readFile
     ifstream myFile;
     myFile.open(readFile);
     if(readFile == ""){
-        cout << "No input provided. Please review usage." << std::endl;
+        cout << "No input provided. Please review usage." << endl;
         exit(0);
     }
     else{

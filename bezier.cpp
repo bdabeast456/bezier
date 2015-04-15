@@ -103,7 +103,6 @@ void myDisplay() {
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
     glLoadIdentity();                       // make sure transformation is "zero'd"
     glScalef(zoom,zoom,zoom);
-
     for (int i=0; i<polygons.size(); i++) {
         Polygon* temp = polygons[i];
         if (temp->id[0] == currID) {
@@ -251,18 +250,18 @@ void specialKey(int key, int x, int y){
         centerPoint[1] = centerPoint[1] + translateIncrement;
     }
     else if(key == GLUT_KEY_UP){
-        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m = matrix(centerPoint[0],centerPoint[1],centerPoint[2],0);
         m.multiplym(matrix(rotIncrement,0,0,2));
-        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
+        m.multiplym(matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0));
     }
     if(glutGetModifiers() == GLUT_ACTIVE_SHIFT && key == GLUT_KEY_RIGHT){ 
         m = matrix(translateIncrement,0, 0 , 0);
         centerPoint[0] = centerPoint[0] + translateIncrement;
     }
     else if(key == GLUT_KEY_RIGHT){
-        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m = matrix(centerPoint[0],centerPoint[1],centerPoint[2],0);
         m.multiplym(matrix(0,rotIncrement,0,2));
-        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
+        m.multiplym(matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0));
 
     }
 
@@ -271,9 +270,9 @@ void specialKey(int key, int x, int y){
         centerPoint[1] = centerPoint[1] - translateIncrement;
     }
     else if(key == GLUT_KEY_DOWN){
-        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m = matrix(centerPoint[0],centerPoint[1],centerPoint[2],0);
         m.multiplym(matrix(-rotIncrement,0,0,2));
-        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
+        m.multiplym(matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0));
 
     }
 
@@ -282,13 +281,11 @@ void specialKey(int key, int x, int y){
         centerPoint[0] = centerPoint[0] - translateIncrement;
     }
     else if(key == GLUT_KEY_LEFT){
-        m = matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0);
+        m = matrix(centerPoint[0],centerPoint[1],centerPoint[2],0);
         m.multiplym(matrix(0,-rotIncrement,0,2));
-        m.multiplym(matrix(centerPoint[0],centerPoint[1],centerPoint[2],0));
-
-
+        m.multiplym(matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0));
     }
-    findCenterPoint(currID);
+    //findCenterPoint(currID);
     transformPolygons(m);    
 }
 
@@ -816,7 +813,6 @@ int main(int argc, char *argv[]) {
                 tessellate(surfaces[i]);
             }
         } else {
-            cout << "hi" << endl;
             int steps = (int)(1/step);
             for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {

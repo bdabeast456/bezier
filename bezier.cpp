@@ -322,9 +322,6 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
      * Recursive routine for adaptive tessellation.
      */
     rCalls++;
-    /*if (rCalls == 482) {
-        exit(0);
-    }*/
     bool e1 = distance(((*realcoords)[0][0]+(*realcoords)[1][0])/2, ((*realcoords)[0][1]+(*realcoords)[1][1])/2, 
             ((*realcoords)[0][2]+(*realcoords)[1][2])/2, s->getSurfacePoint(((*uvcoords)[0][0]+(*uvcoords)[1][0])/2, ((*uvcoords)[0][1]+(*uvcoords)[1][1])/2));
     bool e2 = distance(((*realcoords)[1][0]+(*realcoords)[2][0])/2, ((*realcoords)[1][1]+(*realcoords)[2][1])/2, 

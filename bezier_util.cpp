@@ -235,7 +235,7 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
     vector<double> point2u = bez2Inv.getPoint(v);
     vector<double> point3u = bez3Inv.getPoint(v);
     vector<double> point4u = bez4Inv.getPoint(v);
-    
+
     double u_patch[4][3] = {{point1u[0], point1u[1], point1u[2]},
         {point2u[0], point2u[1], point2u[2]},
         {point3u[0], point3u[1], point3u[2]},
@@ -254,9 +254,33 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
     double C[3] = {(v_bez).patch_store[2][0]*(1-v) + v_bez.patch_store[3][0]*v, 
         v_bez.patch_store[2][1]*(1-v)+ v_bez.patch_store[3][1]*v,
         v_bez.patch_store[2][2]*(1-v)+ v_bez.patch_store[3][2]*v};
-
+    double D[3] = {A[0]*(1-v) + B[0]*v, A[1]*(1-v)+B[1]*v, A[2]*(1-v)*B[2]*v};//A*(1-u) + B*u
+    double E[3] = {B[0]*(1-v) + C[0]*v, B[1]*(1-v)+C[1]*v, B[2]*(1-v)*C[2]*v}; //B*(1-u) + C*u:w
+    double dv[3]= {E[0]-D[0],E[1]-D[1],E[2]-D[2]};
 
     //U DERIVATE CALCULATION
+    double A1[3] = {(u_bez).patch_store[0][0]*(1-u) + u_bez.patch_store[1][0]*u, 
+        u_bez.patch_store[0][1]*(1-u)+ u_bez.patch_store[1][1]*u,
+        u_bez.patch_store[0][2]*(1-u)+ u_bez.patch_store[1][2]*u};
+    double B1[3] = {(u_bez).patch_store[1][0]*(1-u) + u_bez.patch_store[2][0]*u, 
+        u_bez.patch_store[1][1]*(1-u)+ u_bez.patch_store[2][1]*u,
+        u_bez.patch_store[1][2]*(1-u)+ u_bez.patch_store[2][2]*u};
+    double C1[3] = {(u_bez).patch_store[2][0]*(1-u) + u_bez.patch_store[3][0]*u, 
+        u_bez.patch_store[2][1]*(1-u)+ u_bez.patch_store[3][1]*u,
+        u_bez.patch_store[2][2]*(1-u)+ u_bez.patch_store[3][2]*u};
+    double D1[3] = {A1[0]*(1-u) + B1[0]*u, A1[1]*(1-u)+B1[1]*u, A1[2]*(1-u)*B1[2]*u};//A*(1-u) + B*u
+    double E1[3] = {B1[0]*(1-u) + C1[0]*u, B1[1]*(1-u)+C1[1]*u, B1[2]*(1-u)*C1[2]*u}; //B*(1-u) + C*u:w
+    double du[3]= {E1[0]-D1[0],E1[1]-D1[1],E1[2]-D1[2]};
+
+    Vector4 dpdu = Vector4(du[0],du[1],du[2],0);
+    Vector4 dpdv = Vector4(dv[0],dv[1],dv[2],0);
+    Vector4 uv = dpdu.cross(dpdv);
+
+    vector<double> return_value;
+    return_value.push_back(uv.xc());
+    return_value.push_back(uv.yc());
+    return_value.push_back(uv.zc());
+    return return_value;
 
 }
 

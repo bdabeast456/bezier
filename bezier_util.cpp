@@ -202,7 +202,7 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
         {point3[0], point3[1], point3[2]},
         {point4[0], point4[1], point4[2]}};
     Bezier v_bez = Bezier(v_patch);
-    vector<double> v_point = v_bez.getPoint(v);
+    //vector<double> v_point = v_bez.getPoint(v);
 
     Bezier bez1Inv;
     double input1[4][3] = {{bez1.patch_store[0][0],bez1.patch_store[0][1],bez1.patch_store[0][2]},
@@ -247,7 +247,7 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
         {point4u[0], point4u[1], point4u[2]}};
 
     Bezier u_bez = Bezier(u_patch);
-    vector<double> u_point = u_bez.getPoint(v);
+    //vector<double> u_point = u_bez.getPoint(u);
 
     // V DERIVATIVE CALCULATION
     double A[3] = {(v_bez).patch_store[0][0]*(1-v) + v_bez.patch_store[1][0]*v, 
@@ -277,9 +277,9 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
     double E1[3] = {B1[0]*(1-u) + C1[0]*u, B1[1]*(1-u)+C1[1]*u, B1[2]*(1-u)*C1[2]*u}; //B*(1-u) + C*u:w
     double du[3]= {E1[0]-D1[0],E1[1]-D1[1],E1[2]-D1[2]};
 
-    Vector4 dpdu = Vector4(du[0],du[1],du[2],0);
-    Vector4 dpdv = Vector4(dv[0],dv[1],dv[2],0);
-    Vector4 uv = dpdu.cross(dpdv);
+    Vector4 dpdu = Vector4(du[0]*3,du[1]*3,du[2]*3,0);
+    Vector4 dpdv = Vector4(dv[0]*3,dv[1]*3,dv[2]*3,0);
+    Vector4 uv = dpdv.cross(dpdu);
     uv.unit();
 
     vector<double> return_value;

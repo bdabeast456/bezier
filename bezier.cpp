@@ -144,20 +144,20 @@ void myDisplay() {
         for (int j= 0; j < verTemp.size(); j++) {
             //cout << triangleCount << " " << j << endl;
             /*if(!tessellationStrat && !flatShading && triangleCount != 0){
-                if(triangleCount == 3){
-                    cout << "here?" << endl;
-                    j-=1;
-                }
-                if(triangleCount == 5){
-                    cout << "here...????" << endl;
-                    j-=5;
-                }
-                if(triangleCount == 6){
-                    j+=5;
-                    triangleCount = 0;
-                    cout << j << endl;
-                }
-            }*/
+              if(triangleCount == 3){
+              cout << "here?" << endl;
+              j-=1;
+              }
+              if(triangleCount == 5){
+              cout << "here...????" << endl;
+              j-=5;
+              }
+              if(triangleCount == 6){
+              j+=5;
+              triangleCount = 0;
+              cout << j << endl;
+              }
+              }*/
             if(flatShading || tessellationStrat){
                 Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
@@ -208,7 +208,8 @@ void transformPolygons(matrix m){
         for(std::vector<vector<double> >::iterator normPoint = polygon.normals.begin(); normPoint != polygon.normals.end(); ++normPoint){
             vector<double> norm = *normPoint;
             Vector4 normalPoint = Vector4(norm[0],norm[1],norm[2],0);
-            Vector4 newNormal = m.invmult(normalPoint);
+            matrix ma = m.transposeInverse();
+            Vector4 newNormal = ma.multiplyv(normalPoint);
             vector<double> newNormalVector;
             newNormalVector.push_back(newNormal.xc());
             newNormalVector.push_back(newNormal.yc());
@@ -217,6 +218,7 @@ void transformPolygons(matrix m){
             newNormals.push_back(newNormalVector);
 
         }
+        (**poly).normals = newNormals;
         (**poly).vertices = newVertices;
 
 

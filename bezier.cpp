@@ -163,41 +163,27 @@ void findCenterPoint(int idCheck){
     /*
      * Calculates "center" of the shape represented by an input file.
      */
-    vector<double> center;
-    int iterationCount = 1;
-    //for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
-    for(int polygonCount = 0; polygonCount < numSurfaces*4;polygonCount++){
-        //cout << "start" << endl;
-        Polygon polygon = *(polygons[polygonCount]);//**poly;
-        //cout << "continue" << endl;
+    for (int i=0; i<3; i++) {
+        centerPoint.push_back(0);
+    }
+    int iterationCount = 0;
+    for(int i=0; i<polygons.size(); i++) {
+        Polygon polygon = *(polygons[i]);
         if(polygon.id[0] == idCheck){
-            //for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
-            //cout << "NEW POLYGON VERTEX CHECK" << endl;
-            for(int count = 0; count < 4; count++){
-                Vector4 vertex = polygon.vertices[count];
-                //cout << iterationCount << endl;
-                if(iterationCount == 1){ // first iteration
-                    center.push_back(vertex.xc());
-                    center.push_back(vertex.yc());
-                    center.push_back(vertex.zc());
-                }
-                else{
-                    center[0] = center[0] + vertex.xc();
-                    center[1] = center[1] + vertex.yc();
-                    center[2] = center[2] + vertex.zc();
-                }
-                //cout << "finished" << endl;
-                iterationCount = iterationCount+1;
+            for(int j=0; j<polygon.vertices.size(); j++){
+                Vector4 vertex = polygon.vertices[j]; 
+                centerPoint[0] = centerPoint[0] + vertex.xc();
+                centerPoint[1] = centerPoint[1] + vertex.yc();
+                centerPoint[2] = centerPoint[2] + vertex.zc();
+                iterationCount++;
             }
         }
 
     }
     //cout << "MEOW" << endl;
-    center[0] = center[0] / (polygons.size()*4); // divide by # vertices
-    center[1] = center[1] / (polygons.size()*4);
-    center[2] = center[2] / (polygons.size()*4);
-
-    centerPoint = center;
+    centerPoint[0] = centerPoint[0] / iterationCount; // divide by # vertices
+    centerPoint[1] = centerPoint[1] / iterationCount;
+    centerPoint[2] = centerPoint[2] / iterationCount;
 }
 
 void myKey(unsigned char key, int x, int y) {
@@ -676,8 +662,7 @@ void tessellate(Surface s) {
         poly.push_back(point2);
         poly.push_back(point3);
         poly.push_back(point4);
-        Polygon newPol = Polygon(poly, currID);
-        Polygon* newPoly = &newPol;
+        Polygon* newPoly = new Polygon(poly, currID);
         polygons.push_back(newPoly);        
     }
 }
@@ -850,6 +835,7 @@ int main(int argc, char *argv[]) {
                 tessellate(surfaces[i]);
             }
         } else {
+            cout << "hi" << endl;
             int steps = (int)(1/step);
             for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {
@@ -857,10 +843,12 @@ int main(int argc, char *argv[]) {
                     double vend = v+step;
                     for (int ub=0; ub<steps; ub++) {
                         double u = (double)(ub*step);
+                        cout << "in the 3rd for" << endl;
                         adaptTessellate(surfaces[s], u, v, u+step, vend);
                     }
                 }
                 //Cleanup if necessary.
+                //cout << "after inner for" << endl;
                 if (1-(steps*step) > .0000001) {
                     double v = (double)(steps*step);
                     for (int ub=0; ub<steps; ub++) {
@@ -875,7 +863,9 @@ int main(int argc, char *argv[]) {
                     v = steps*step;
                     adaptTessellate(surfaces[s], u, v, 1, 1);   
                 }
+                //cout << "one outer for looped" << endl;
             }
+            //cout << "hi2" << endl;
         }
         cout << "out of if-else statement" << endl;
         findCenterPoint(currID);

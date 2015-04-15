@@ -174,9 +174,6 @@ Polygon::Polygon(vector<vector<double> > vx, int ident) {
 }
 
 matrix::matrix() {
-	/*
-	* Constructs the identity matrix.
-	*/
 	mtrx.clear();
 	inv.clear();
     mtrx.push_back(Vector4(1.0, 0.0, 0.0, 0.0));
@@ -191,10 +188,6 @@ matrix::matrix() {
 }
 
 matrix::matrix(double a, double b, double c, int mtype) {
-	/*
-	* Constructs a transformation matrix. 0 = translation,
-	* 1 = scaling, and 2 = rotation (exponential map).
-	*/
 	mtrx.clear();
 	inv.clear();
     if (mtype == 0) { // translation 
@@ -212,11 +205,12 @@ matrix::matrix(double a, double b, double c, int mtype) {
         inv.push_back(Vector4(0.0, 1.0/b, 0.0, 0.0));
         inv.push_back(Vector4(0.0, 0.0, 1.0/c, 0.0));
     } else if (mtype == 2) { //rotation
-        double length = pow(pow(a, 2) + pow(b, 2) + pow(c, 2), .5);
         double theta = pow(pow(a, 2) + pow(b, 2) + pow(c, 2), .5)*PI_rad;
-        double x = a/length;
-        double y = b/length;
-        double z = c/length;
+        Vector4 rotation = Vector4(a, b, c,0);
+        rotation.unit();
+        double x = rotation.xc();
+        double y = rotation.yc();
+        double z = rotation.zc();
         mtrx.push_back(Vector4(pow(x, 2)+(pow(z, 2)+pow(y, 2))*cos(theta),
                          x*y-z*sin(theta)-x*y*cos(theta),
                          x*z+y*sin(theta)-x*z*cos(theta), 0.0));
@@ -240,18 +234,31 @@ matrix::matrix(double a, double b, double c, int mtype) {
     inv.push_back(Vector4(0.0, 0.0, 0.0, 1.0));
 }
 
+matrix::matrix(double x1, double x2, double x3, double x4,
+               double y1, double y2, double y3, double y4,
+               double z1, double z2, double z3, double z4,
+               double w1, double w2, double w3, double w4) {
+	mtrx.clear();
+	inv.clear();
+    mtrx.push_back(Vector4(x1, y1, z1, w1));
+    mtrx.push_back(Vector4(x2, y2, z2, w2));
+    mtrx.push_back(Vector4(x3, y3, z3, w3));
+    mtrx.push_back(Vector4(x4, y4, z4, w4));
+
+    for (int i=0; i<4; i++) {
+        inv.push_back(Vector4());
+    }
+}
+
 Vector4 matrix::multiplyv(Vector4 v) {
-	/*
-	* Returns a new Vector4 as the result of matrix * v.
-	*/
     return Vector4(mtrx[0].dot4(v), mtrx[1].dot4(v), mtrx[2].dot4(v), mtrx[3].dot4(v));
 }
 
+Vector4 matrix::invmult(Vector4 v) {
+    return Vector4(inv[0].dot4(v), inv[1].dot4(v), inv[2].dot4(v), inv[3].dot4(v));
+}
+
 void matrix::multiplym(matrix m) {
-	/*
-	* Multiplies "right multiplies" this matrix by the matrix m. The result is stored in
-	* this matrix.
-	*/
     Vector4 a = Vector4(m.mtrx[0].xc(), m.mtrx[1].xc(), m.mtrx[2].xc(), m.mtrx[3].xc());
     Vector4 b = Vector4(m.mtrx[0].yc(), m.mtrx[1].yc(), m.mtrx[2].yc(), m.mtrx[3].yc());
     Vector4 c = Vector4(m.mtrx[0].zc(), m.mtrx[1].zc(), m.mtrx[2].zc(), m.mtrx[3].zc());
@@ -268,10 +275,14 @@ void matrix::multiplym(matrix m) {
     }
 }
 
+matrix matrix::transposeInverse() {
+    return matrix(inv[0].xc(), inv[0].yc(), inv[0].zc(), inv[0].wc(),
+                  inv[1].xc(), inv[1].yc(), inv[1].zc(), inv[1].wc(),
+                  inv[2].xc(), inv[2].yc(), inv[2].zc(), inv[2].wc(),
+                  inv[3].xc(), inv[3].yc(), inv[3].zc(), inv[3].wc());
+}
+
 void matrix::printMatrix() {
-	/*
-	* Prints out both matrix and inverse
-	*/
 	cout << "Printing matrix" << endl;
 	for (int i=0; i<4; i++) {
 		cout << mtrx[i].xc() << " " << mtrx[i].yc() << " " << mtrx[i].zc() << " " << mtrx[i].wc() << endl;
@@ -282,3 +293,5 @@ void matrix::printMatrix() {
 	}
 	cout << endl;
 }
+
+

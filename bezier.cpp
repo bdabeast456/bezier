@@ -112,12 +112,12 @@ void myDisplay() {
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
-        for (int j=verTemp.size()-1; j>=0; j--) {
-            //Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-            //Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
-            //Vector4 crossP = v2.cross(v1);
-            //crossP.unit();
-            //glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+        for (int j=0; j<verTemp.size(); j++) {
+            Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 crossP = v2.cross(v1);
+            crossP.unit();
+            glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }
         glEnd();
@@ -195,6 +195,7 @@ void myKey(unsigned char key, int x, int y) {
     }
 
     if(key == 115){ // 's' toggle between flat and smooth
+        cout << "switch!" << endl;
         if(flatShading == true){
             flatShading = false;
             glShadeModel(GL_SMOOTH);
@@ -551,7 +552,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     pt3uv.push_back(u+step);
     pt3uv.push_back(v+step);
     vector<double> point4 = s.getSurfacePoint(u, vend);
-    //cout << "hi im here" << endl;
     vector<double> pt4uv;
     pt4uv.push_back(u);
     pt4uv.push_back(v+step);
@@ -571,7 +571,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt3uv);
     uv2.push_back(pt4uv);
     uv2.push_back(pt1uv);
-    //cout << "hi2" << endl;
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
 }
@@ -872,7 +871,7 @@ int main(int argc, char *argv[]) {
     glutReshapeFunc(myReshape);             // function to run when the window gets resized
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
-    glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
+    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else

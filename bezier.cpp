@@ -139,7 +139,12 @@ void myDisplay() {
         } else {
             //glColor3f(1.0f, 0.0f, 1.0f);
         }
-        glBegin(GL_QUADS);
+        if(tessellationStrat){
+            glBegin(GL_TRIANGLES);
+        }
+        else{
+            glBegin(GL_QUADS);
+        }
         vector<Vector4> verTemp = temp->vertices;
         for (int j= 0; j < verTemp.size(); j++) {
             Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
@@ -608,6 +613,7 @@ void tessellate(Surface s) {
     /*
      * Perform uniform tessellation on Surface s. Step is specified as a global variable.
      */
+    //cout << "tessellate" << endl;
     int steps = (int)(1/step);
     for (int vb=0; vb<steps; vb++) {
         double v = (double)(vb*step);
@@ -774,7 +780,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                //cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
+                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -874,7 +880,7 @@ int main(int argc, char *argv[]) {
         surfaces.clear();
 
     } // end of parsing 
-
+    cout << "End of parsing" << endl;
     //This initializes glut
     glutInit(&argc, argv);
     //This tells glut to use a double-buffered window with red, green, and blue channels 

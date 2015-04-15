@@ -158,7 +158,7 @@ void myDisplay() {
               cout << j << endl;
               }
               }*/
-            if(flatShading || tessellationStrat){
+            if(flatShading){
                 Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 crossP = v2.cross(v1);
@@ -369,15 +369,21 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
             ((*realcoords)[1][2]+(*realcoords)[2][2])/2, s->getSurfacePoint(((*uvcoords)[1][0]+(*uvcoords)[2][0])/2, ((*uvcoords)[1][1]+(*uvcoords)[2][1])/2));
     bool e3 = distance(((*realcoords)[2][0]+(*realcoords)[0][0])/2, ((*realcoords)[2][1]+(*realcoords)[0][1])/2, 
             ((*realcoords)[2][2]+(*realcoords)[0][2])/2, s->getSurfacePoint(((*uvcoords)[2][0]+(*uvcoords)[0][0])/2, ((*uvcoords)[2][1]+(*uvcoords)[0][1])/2));
-    if (rCalls == 481) {
+    /*if (rCalls == 481) {
         for (int i=0; i<3; i++) {
             for (int j=0; j<3; j++) {
                 cout << (*realcoords)[i][j] << endl;
             }
         }
-    }
+    }*/
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(*realcoords, currID);
+        vector<double> normal1 = s->getSurfaceNormal((*uvcoords)[0][0], (*uvcoords)[0][1]);
+        vector<double> normal2 = s->getSurfaceNormal((*uvcoords)[1][0], (*uvcoords)[1][1]);
+        vector<double> normal3 = s->getSurfaceNormal((*uvcoords)[2][0], (*uvcoords)[2][1]);
+        newPoly->normals.push_back(normal1);
+        newPoly->normals.push_back(normal2);
+        newPoly->normals.push_back(normal3);
         polygons.push_back(newPoly);
         return;
     } else if (!e1 && e2 && e3) {
@@ -713,9 +719,9 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2->push_back(pt4uv);
     uv2->push_back(pt1uv);
     adaptRecurse(&s, trgl1, uv1);
-    adaptRecurse(&s, trgl2, uv2);
     delete trgl1;
     delete uv1;
+    adaptRecurse(&s, trgl2, uv2);
     delete trgl2;
     delete uv2;
 }
@@ -836,7 +842,7 @@ void tessellate(Surface s) {
         newPoly->normals.push_back(normal2);
         newPoly->normals.push_back(normal3);
         newPoly->normals.push_back(normal4);
-        polygons.push_back(newPoly);        
+        polygons.push_back(newPoly);       
     }
 }
 

@@ -297,15 +297,10 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     //cout << "start adaptRecurse" << endl;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
-    //cout << "end e1" << endl;
-    //cout << "realcoord " << realcoords[2][2] << endl;
-    //cout << "uvcoords " << uvcoords[2].size() << endl;
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
-    //cout << "end e2" << endl;
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
-    //cout << e1 << " " << e2 << " " << e3 << endl;
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -573,6 +568,7 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt1uv);
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
+    cout << "end" << endl;
 }
 
 void tessellate(Surface s) {
@@ -871,7 +867,7 @@ int main(int argc, char *argv[]) {
     glutReshapeFunc(myReshape);             // function to run when the window gets resized
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST | GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else

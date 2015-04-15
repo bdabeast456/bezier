@@ -583,6 +583,7 @@ void tessellate(Surface s) {
     /*
      * Perform uniform tessellation on Surface s. Step is specified as a global variable.
      */
+    //cout << "in tessellate" << endl;
     int steps = (int)(1/step);
     for (int vb=0; vb<steps; vb++) {
         double v = (double)(vb*step);
@@ -812,11 +813,13 @@ int main(int argc, char *argv[]) {
             } // end of if(token[0])
         } // end of while(!myFile.eof())
         if (!tessellationStrat) {
+            cout << "UNIFORM TESSELLATION" << endl;
+            cout << step << endl;
             for (int i=0; i<surfaces.size(); i++) {
                 tessellate(surfaces[i]);
             }
         } else {
-            cout << "hi" << endl;
+            cout << "ADAPTIVE TESSELLATION" << endl;
             int steps = (int)(1/step);
             for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {

@@ -63,7 +63,7 @@ int tessellationStrat = 0;
 int currID = 0;
 double step = .1;
 double errorBound;
-bool flatShading = false; // if false, do smooth shading. if true, do flat shading
+bool flatShading = true; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down
 double rotIncrement =1.5;
@@ -76,7 +76,31 @@ double zoom = 1;
 // Simple init function
 //****************************************************
 void initScene(){
+    GLfloat mat_specular[] = { 0.1, 0.1, 0.1, 1.0 };
+    GLfloat mat_shininess[] = { 320 };
+    GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
+    //GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glShadeModel (GL_FLAT);
 
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff);
+
+
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
 
 }
 
@@ -104,16 +128,18 @@ void myDisplay() {
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
     glLoadIdentity();                       // make sure transformation is "zero'd"
     glScalef(zoom,zoom,zoom);
+    //glEnable(GL_LIGHTING);
     for (int i=0; i<polygons.size(); i++) {
         Polygon* temp = polygons[i];
         if (temp->id[0] == currID) {
-            glColor3f(1.0f, 0.5f, 0.0f);
+            //glColor3f(1.0f, 0.5f, 0.0f);
+
         } else {
-            glColor3f(1.0f, 0.0f, 1.0f);
+            //glColor3f(1.0f, 0.0f, 1.0f);
         }
-        glBegin(GL_POLYGON);
+        glBegin(GL_QUADS);
         vector<Vector4> verTemp = temp->vertices;
-        for (int j=0; j<verTemp.size(); j++) {
+        for (int j= 0; j < verTemp.size(); j++) {
             Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
             Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
             Vector4 crossP = v2.cross(v1);
@@ -180,7 +206,6 @@ void findCenterPoint(int idCheck){
         }
 
     }
-    //cout << "MEOW" << endl;
     centerPoint[0] = centerPoint[0] / iterationCount; // divide by # vertices
     centerPoint[1] = centerPoint[1] / iterationCount;
     centerPoint[2] = centerPoint[2] / iterationCount;
@@ -195,7 +220,6 @@ void myKey(unsigned char key, int x, int y) {
     }
 
     if(key == 115){ // 's' toggle between flat and smooth
-        cout << "switch!" << endl;
         if(flatShading == true){
             flatShading = false;
             glShadeModel(GL_SMOOTH);
@@ -332,9 +356,11 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         adaptRecurse(s, trgl2, uv2);
         return;
     } else if (e1 && !e2 && e3) {
+        cout << "1 0 1 if statement" << endl;
         double insert1[] = {(uvcoords[0][0]+uvcoords[2][0])/2, (uvcoords[0][1]+uvcoords[2][1])/2};
         vector<double> newpoint1 = s.getSurfacePoint(insert1[0], insert1[1]);
         vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
+        //cout << "101 now" << endl;
         vector<vector<double> > trgl1;
         vector<vector<double> > uv1;    
         vector<vector<double> > trgl2;
@@ -540,7 +566,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
      * Starting routine for adaptive tessellation.
      */
-    //cout << "start adaptTessellate" << endl;
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> pt1uv;
     pt1uv.push_back(u);
@@ -680,11 +705,13 @@ int main(int argc, char *argv[]) {
 
     double possibleStep = atof(string(arg2).c_str());
     if(argc == 3){ // uniform
-        //cout << possibleStep << endl;
         step = possibleStep;
 
     }
     else if(argc > 3 && string(argv[3]) == "-a"){
+        if(possibleStep <= 0.02){
+            possibleStep = 0.021;
+        }
         errorBound = possibleStep;
         tessellationStrat = 1;
     }
@@ -729,12 +756,10 @@ int main(int argc, char *argv[]) {
         myFile.seekg(0, ios::beg);
 
         while (!myFile.eof()){
-            //cout << "new line!" << endl;
             char buf[MAX_CHARS_PER_LINE];
             myFile.getline(buf, MAX_CHARS_PER_LINE);
             const char* token[MAX_TOKENS_PER_LINE] = {}; 
             token[0] = strtok(buf, DELIMITER); // first token
-            //cout << token[0] << endl;
 
             if (token[0]){
                 int length = 0;
@@ -747,7 +772,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
+                //cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -810,10 +835,12 @@ int main(int argc, char *argv[]) {
             } // end of if(token[0])
         } // end of while(!myFile.eof())
         if (!tessellationStrat) {
+            cout << "UNIFORM TESSELLATION" << endl;
             for (int i=0; i<surfaces.size(); i++) {
                 tessellate(surfaces[i]);
             }
         } else {
+            cout << "ADAPTIVE TESSELLATION" << endl;
             int steps = (int)(1/step);
             for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {
@@ -821,12 +848,10 @@ int main(int argc, char *argv[]) {
                     double vend = v+step;
                     for (int ub=0; ub<steps; ub++) {
                         double u = (double)(ub*step);
-                        //cout << "in the 3rd for" << endl;
                         adaptTessellate(surfaces[s], u, v, u+step, vend);
                     }
                 }
                 //Cleanup if necessary.
-                //cout << "after inner for" << endl;
                 if (1-(steps*step) > .0000001) {
                     double v = (double)(steps*step);
                     for (int ub=0; ub<steps; ub++) {
@@ -841,13 +866,9 @@ int main(int argc, char *argv[]) {
                     v = steps*step;
                     adaptTessellate(surfaces[s], u, v, 1, 1);   
                 }
-                //cout << "one outer for looped" << endl;
             }
-            //cout << "hi2" << endl;
         }
-        //cout << "out of if-else statement" << endl;
         findCenterPoint(currID);
-        cout << "found centerPoint" << endl;
         surfaces.clear();
 
     } // end of parsing 

@@ -112,12 +112,12 @@ void myDisplay() {
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
-        for (int j=verTemp.size()-1; j>=0; j--) {
-            //Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-            //Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
-            //Vector4 crossP = v2.cross(v1);
-            //crossP.unit();
-            //glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+        for (int j=0; j<verTemp.size(); j++) {
+            Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+            Vector4 crossP = v2.cross(v1);
+            crossP.unit();
+            glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
         }
         glEnd();
@@ -195,6 +195,7 @@ void myKey(unsigned char key, int x, int y) {
     }
 
     if(key == 115){ // 's' toggle between flat and smooth
+        cout << "switch!" << endl;
         if(flatShading == true){
             flatShading = false;
             glShadeModel(GL_SMOOTH);
@@ -298,6 +299,7 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     cout << "not even now?" << endl;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
+<<<<<<< HEAD
     cout << "end e1" << endl;
     //cout << "realcoord " << realcoords[2][2] << endl;
     //cout << "uvcoords " << uvcoords[2].size() << endl;
@@ -307,6 +309,12 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
     cout << e1 << " " << e2 << " " << e3 << endl;
+=======
+    bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
+            (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
+    bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
+            (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+>>>>>>> 313a35d55d086dbc48609b9204aa05f6033c1f14
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -571,7 +579,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     pt3uv.push_back(u+step);
     pt3uv.push_back(v+step);
     vector<double> point4 = s.getSurfacePoint(u, vend);
-    //cout << "hi im here" << endl;
     vector<double> pt4uv;
     pt4uv.push_back(u);
     pt4uv.push_back(v+step);
@@ -591,9 +598,13 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt3uv);
     uv2.push_back(pt4uv);
     uv2.push_back(pt1uv);
+<<<<<<< HEAD
     cout << "hi2" << endl;
+=======
+>>>>>>> 313a35d55d086dbc48609b9204aa05f6033c1f14
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
+    cout << "end" << endl;
 }
 
 void tessellate(Surface s) {
@@ -900,7 +911,7 @@ int main(int argc, char *argv[]) {
     glutReshapeFunc(myReshape);             // function to run when the window gets resized
     glutKeyboardFunc(myKey);
     glutSpecialFunc(specialKey);
-    glEnable(GL_DEPTH_TEST | GL_NORMALIZE);
+    glEnable(GL_DEPTH_TEST | GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
     // and whatever else

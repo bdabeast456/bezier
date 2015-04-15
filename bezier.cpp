@@ -62,7 +62,7 @@ int tessellationStrat = 0;
 int currID = 0;
 double step = .1;
 double errorBound;
-bool flatShading = false; // if false, do smooth shading. if true, do flat shading
+bool flatShading = true; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
 //bool shiftDown = false; // if shiftKey down
 double rotIncrement =1.5;
@@ -75,8 +75,8 @@ double zoom = 1;
 // Simple init function
 //****************************************************
 void initScene(){
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_shininess[] = { 100 };
+    GLfloat mat_specular[] = { 0.1, 0.1, 0.1, 1.0 };
+    GLfloat mat_shininess[] = { 320 };
     GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
     //GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
     glClearColor (0.0, 0.0, 0.0, 0.0);
@@ -136,7 +136,7 @@ void myDisplay() {
         } else {
             //glColor3f(1.0f, 0.0f, 1.0f);
         }
-        glBegin(GL_POLYGON);
+        glBegin(GL_QUADS);
         vector<Vector4> verTemp = temp->vertices;
         for (int j= 0; j < verTemp.size(); j++) {
             Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
@@ -221,7 +221,7 @@ void myKey(unsigned char key, int x, int y) {
     }
 
     if(key == 115){ // 's' toggle between flat and smooth
-        cout << "switch!" << endl;
+       // cout << "switch!" << endl;
         if(flatShading == true){
             flatShading = false;
             glShadeModel(GL_SMOOTH);

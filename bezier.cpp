@@ -132,6 +132,7 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
      * Tells if errorBound is larger than the distance between points.
      */
+    //cout << errorBound << endl;
     if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
         return true;
     } else { 
@@ -294,12 +295,18 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     /*
      * Recursive routine for adaptive tessellation.
      */
+    cout << "start adaptRecurse" << endl;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
+    //cout << "end e1" << endl;
+    cout << "realcoord " << realcoords[2][2] << endl;
+    cout << "uvcoords " << uvcoords[2].size() << endl;
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
+    cout << "end e2" << endl;
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+    cout << e1 << " " << e2 << " " << e3 << endl;
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -532,6 +539,7 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
      * Starting routine for adaptive tessellation.
      */
+    cout << "start adaptTessellate" << endl;
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> pt1uv;
     pt1uv.push_back(u);
@@ -542,9 +550,10 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     pt2uv.push_back(v);
     vector<double> point3 = s.getSurfacePoint(uend, vend);
     vector<double> pt3uv;
-    pt1uv.push_back(u+step);
-    pt1uv.push_back(v+step);
+    pt3uv.push_back(u+step);
+    pt3uv.push_back(v+step);
     vector<double> point4 = s.getSurfacePoint(u, vend);
+    //cout << "hi im here" << endl;
     vector<double> pt4uv;
     pt4uv.push_back(u);
     pt4uv.push_back(v+step);
@@ -564,6 +573,7 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt3uv);
     uv2.push_back(pt4uv);
     uv2.push_back(pt1uv);
+    //cout << "hi2" << endl;
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
 }

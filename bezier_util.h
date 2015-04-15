@@ -36,6 +36,7 @@ class Bezier{
     vector<double> cx;
     vector<double> cy;
     vector<double> cz;
+    vector<vector<double> > patch_store;
     
 };
 
@@ -52,6 +53,7 @@ class Surface{
         Bezier bez3;
         Bezier bez4;
         vector<double> getSurfacePoint(double u, double v);
+        vector<double> getSurfaceNormal(double u, double v);
 };
 
 

@@ -76,30 +76,32 @@ double zoom = 1;
 //****************************************************
 void initScene(){
     GLfloat mat_specular[] = { 0.1, 0.1, 0.1, 1.0 };
-    GLfloat mat_shininess[] = { 320 };
+    GLfloat mat_shininess[] = { 350 };
     GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
     //GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glShadeModel (GL_FLAT);
+    //glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff);
 
 
-    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    //glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
+    
 
 }
 

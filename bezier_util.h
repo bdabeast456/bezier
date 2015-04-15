@@ -74,10 +74,18 @@ class matrix {
 public:
     matrix();
 	matrix(double a, double b, double c, int mtype);
+    matrix(double x1, double x2, double x3, double x4,
+           double y1, double y2, double y3, double y4,
+           double z1, double z2, double z3, double z4,
+           double w1, double w2, double w3, double w4);
 	Vector4 multiplyv(Vector4 v);
+    Vector4 invmult(Vector4 v);
 	void multiplym(matrix m);
+    matrix transposeInverse();
     void printMatrix();
 private:
     vector<Vector4> mtrx;
     vector<Vector4> inv;
 };
+
+

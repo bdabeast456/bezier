@@ -75,7 +75,31 @@ double zoom = 1;
 // Simple init function
 //****************************************************
 void initScene(){
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[] = { 100 };
+    GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
+    //GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glShadeModel (GL_FLAT);
 
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff);
+
+
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
 
 }
 
@@ -103,16 +127,18 @@ void myDisplay() {
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
     glLoadIdentity();                       // make sure transformation is "zero'd"
     glScalef(zoom,zoom,zoom);
+    //glEnable(GL_LIGHTING);
     for (int i=0; i<polygons.size(); i++) {
         Polygon* temp = polygons[i];
         if (temp->id[0] == currID) {
-            glColor3f(1.0f, 0.5f, 0.0f);
+            //glColor3f(1.0f, 0.5f, 0.0f);
+
         } else {
-            glColor3f(1.0f, 0.0f, 1.0f);
+            //glColor3f(1.0f, 0.0f, 1.0f);
         }
         glBegin(GL_POLYGON);
         vector<Vector4> verTemp = temp->vertices;
-        for (int j=0; j<verTemp.size(); j++) {
+        for (int j= 0; j < verTemp.size(); j++) {
             Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
             Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
             Vector4 crossP = v2.cross(v1);
@@ -299,22 +325,10 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     cout << "not even now?" << endl;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
-<<<<<<< HEAD
-    cout << "end e1" << endl;
-    //cout << "realcoord " << realcoords[2][2] << endl;
-    //cout << "uvcoords " << uvcoords[2].size() << endl;
-    bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
-            (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
-    cout << "end e2" << endl;
-    bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
-            (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
-    cout << e1 << " " << e2 << " " << e3 << endl;
-=======
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
->>>>>>> 313a35d55d086dbc48609b9204aa05f6033c1f14
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -598,10 +612,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt3uv);
     uv2.push_back(pt4uv);
     uv2.push_back(pt1uv);
-<<<<<<< HEAD
-    cout << "hi2" << endl;
-=======
->>>>>>> 313a35d55d086dbc48609b9204aa05f6033c1f14
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
     cout << "end" << endl;
@@ -879,7 +889,7 @@ int main(int argc, char *argv[]) {
                     v = steps*step;
                     adaptTessellate(surfaces[s], u, v, 1, 1);   
                 }
-               cout << "one outer for looped~~~~~~~" << endl;
+                cout << "one outer for looped~~~~~~~" << endl;
             }
             //cout << "hi2" << endl;
         }

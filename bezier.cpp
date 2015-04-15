@@ -55,6 +55,7 @@ class Viewport {
 // Global Variables
 //****************************************************
 Viewport    viewport;
+int rCalls = 0;
 int numSurfaces;
 vector<Surface> surfaces;
 vector<Polygon*> polygons;
@@ -159,7 +160,6 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
      * Tells if errorBound is larger than the distance between points.
      */
-    //cout << errorBound << endl;
     if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
         return true;
     } else { 
@@ -208,7 +208,6 @@ void findCenterPoint(int idCheck){
         }
 
     }
-    //cout << "MEOW" << endl;
     centerPoint[0] = centerPoint[0] / iterationCount; // divide by # vertices
     centerPoint[1] = centerPoint[1] / iterationCount;
     centerPoint[2] = centerPoint[2] / iterationCount;
@@ -223,7 +222,6 @@ void myKey(unsigned char key, int x, int y) {
     }
 
     if(key == 115){ // 's' toggle between flat and smooth
-       // cout << "switch!" << endl;
         if(flatShading == true){
             flatShading = false;
             glShadeModel(GL_SMOOTH);
@@ -322,15 +320,16 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     /*
      * Recursive routine for adaptive tessellation.
      */
-    cout << "test" << endl;
-    cout << "start adaptRecurse" << endl;
-    cout << "not even now?" << endl;
+    rCalls++;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+    /*if (rCalls == 3845) {
+        cout << "first " << uvcoords[2][1] << endl;
+    }*/
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -380,22 +379,14 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         uv2.push_back(newpt1);
         uv2.push_back(uvcoords[1]);
         uv2.push_back(uvcoords[2]);
-        cout << "end of 101 before recurse" << endl;
-        //cout << "another one" << endl;
-        for(int i  = 0; i < trgl1.size(); i++){
-            for(int j = 0; j < trgl1[i].size(); j++){
-                cout << i << ", " << j << ":" <<uv2[i][j] << endl;
-            }
-        }
-        cout << "out of test for loop" << endl;
-        //cout.flush();
+        /*if (rCalls == 3845) {
+            cout << "second " << uvcoords[2][1] << " " << uvcoords[0][0] << endl;
+            exit(0);
+        }*/
         adaptRecurse(s, trgl1, uv1);
-        cout << "HI" << endl;
         adaptRecurse(s, trgl2, uv2);
-        //cout << "101~~~~~~~~~~~~~~~~~~~~" << endl;
         return;        
     } else if (e1 && e2 && !e3) {
-        cout << "OH HAI!" << endl;
         double insert1[] = {(uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2};
         vector<double> newpoint1 = s.getSurfacePoint(insert1[0], insert1[1]);
         vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
@@ -403,7 +394,6 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         vector<vector<double> > uv1;    
         vector<vector<double> > trgl2;
         vector<vector<double> > uv2;
-        cout << "now?" << endl;
         trgl1.push_back(newpoint1);
         trgl1.push_back(realcoords[0]);
         trgl1.push_back(realcoords[1]);
@@ -416,11 +406,8 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         uv2.push_back(newpt1);
         uv2.push_back(uvcoords[2]);
         uv2.push_back(uvcoords[0]);
-        cout << "OHAI AGAIN!" << endl;
         adaptRecurse(s, trgl1, uv1);
         adaptRecurse(s, trgl2, uv2);
-        cout << "110~~~~~~~~~~~~~~~~~~~~" << endl;
-
         return;
     } else if (!e1 && !e2 && e3) {
         double insert1[] = {(uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2};
@@ -581,7 +568,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
      * Starting routine for adaptive tessellation.
      */
-    cout << "start adaptTessellate" << endl;
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> pt1uv;
     pt1uv.push_back(u);
@@ -616,14 +602,12 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt1uv);
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
-    cout << "end" << endl;
 }
 
 void tessellate(Surface s) {
     /*
      * Perform uniform tessellation on Surface s. Step is specified as a global variable.
      */
-    //cout << "in tessellate" << endl;
     int steps = (int)(1/step);
     for (int vb=0; vb<steps; vb++) {
         double v = (double)(vb*step);
@@ -723,7 +707,6 @@ int main(int argc, char *argv[]) {
 
     double possibleStep = atof(string(arg2).c_str());
     if(argc == 3){ // uniform
-        //cout << possibleStep << endl;
         step = possibleStep;
 
     }
@@ -775,12 +758,10 @@ int main(int argc, char *argv[]) {
         myFile.seekg(0, ios::beg);
 
         while (!myFile.eof()){
-            //cout << "new line!" << endl;
             char buf[MAX_CHARS_PER_LINE];
             myFile.getline(buf, MAX_CHARS_PER_LINE);
             const char* token[MAX_TOKENS_PER_LINE] = {}; 
             token[0] = strtok(buf, DELIMITER); // first token
-            //cout << token[0] << endl;
 
             if (token[0]){
                 int length = 0;
@@ -793,7 +774,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
+                //cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -857,26 +838,22 @@ int main(int argc, char *argv[]) {
         } // end of while(!myFile.eof())
         if (!tessellationStrat) {
             cout << "UNIFORM TESSELLATION" << endl;
-            cout << step << endl;
             for (int i=0; i<surfaces.size(); i++) {
                 tessellate(surfaces[i]);
             }
         } else {
             cout << "ADAPTIVE TESSELLATION" << endl;
             int steps = (int)(1/step);
-            //cout << ((surfaces[1]).bez1.cx)[0] << endl;
             for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {
                     double v = (double)(vb*step);
                     double vend = v+step;
                     for (int ub=0; ub<steps; ub++) {
                         double u = (double)(ub*step);
-                        cout << "in the 3rd for" << endl;
                         adaptTessellate(surfaces[s], u, v, u+step, vend);
                     }
                 }
                 //Cleanup if necessary.
-                cout << "after inner for" << endl;
                 if (1-(steps*step) > .0000001) {
                     double v = (double)(steps*step);
                     for (int ub=0; ub<steps; ub++) {
@@ -891,13 +868,9 @@ int main(int argc, char *argv[]) {
                     v = steps*step;
                     adaptTessellate(surfaces[s], u, v, 1, 1);   
                 }
-                cout << "one outer for looped~~~~~~~" << endl;
             }
-            //cout << "hi2" << endl;
         }
-        //cout << "out of if-else statement" << endl;
         findCenterPoint(currID);
-        cout << "found centerPoint" << endl;
         surfaces.clear();
 
     } // end of parsing 

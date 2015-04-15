@@ -61,7 +61,7 @@ vector<Surface> surfaces;
 vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step = .1;
+double step = .2;
 double errorBound;
 bool flatShading = true; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
@@ -133,12 +133,6 @@ void myDisplay() {
     //glEnable(GL_LIGHTING);
     for (int i=0; i<polygons.size(); i++) {
         Polygon* temp = polygons[i];
-        if (temp->id[0] == currID) {
-            //glColor3f(1.0f, 0.5f, 0.0f);
-
-        } else {
-            //glColor3f(1.0f, 0.0f, 1.0f);
-        }
         if(tessellationStrat){
             glBegin(GL_TRIANGLES);
         }
@@ -223,6 +217,8 @@ void myKey(unsigned char key, int x, int y) {
      * General input key handling.
      */
     if(key==32) {
+        cout << rCalls << endl;
+        cout << polygons.size() << endl;
         exit(0);
     }
 
@@ -326,15 +322,15 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
      * Recursive routine for adaptive tessellation.
      */
     rCalls++;
+    if (rCalls == 3000) {
+        exit(0);
+    }
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
-    /*if (rCalls == 3845) {
-        cout << "first " << uvcoords[2][1] << endl;
-    }*/
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -363,11 +359,9 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         adaptRecurse(s, trgl2, uv2);
         return;
     } else if (e1 && !e2 && e3) {
-        cout << "1 0 1 if statement" << endl;
         double insert1[] = {(uvcoords[0][0]+uvcoords[2][0])/2, (uvcoords[0][1]+uvcoords[2][1])/2};
         vector<double> newpoint1 = s.getSurfacePoint(insert1[0], insert1[1]);
         vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
-        //cout << "101 now" << endl;
         vector<vector<double> > trgl1;
         vector<vector<double> > uv1;    
         vector<vector<double> > trgl2;
@@ -384,10 +378,6 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         uv2.push_back(newpt1);
         uv2.push_back(uvcoords[1]);
         uv2.push_back(uvcoords[2]);
-        /*if (rCalls == 3845) {
-            cout << "second " << uvcoords[2][1] << " " << uvcoords[0][0] << endl;
-            exit(0);
-        }*/
         adaptRecurse(s, trgl1, uv1);
         adaptRecurse(s, trgl2, uv2);
         return;        
@@ -579,16 +569,16 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     pt1uv.push_back(v);
     vector<double> point2 = s.getSurfacePoint(uend, v);
     vector<double> pt2uv;
-    pt2uv.push_back(u+step);
+    pt2uv.push_back(uend);
     pt2uv.push_back(v);
     vector<double> point3 = s.getSurfacePoint(uend, vend);
     vector<double> pt3uv;
-    pt3uv.push_back(u+step);
-    pt3uv.push_back(v+step);
+    pt3uv.push_back(uend);
+    pt3uv.push_back(vend);
     vector<double> point4 = s.getSurfacePoint(u, vend);
     vector<double> pt4uv;
     pt4uv.push_back(u);
-    pt4uv.push_back(v+step);
+    pt4uv.push_back(vend);
     vector<vector<double> > trgl1;
     vector<vector<double> > uv1;
     vector<vector<double> > trgl2;

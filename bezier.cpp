@@ -55,6 +55,7 @@ class Viewport {
 // Global Variables
 //****************************************************
 Viewport    viewport;
+int rCalls = 0;
 int numSurfaces;
 vector<Surface> surfaces;
 vector<Polygon*> polygons;
@@ -131,7 +132,6 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
      * Tells if errorBound is larger than the distance between points.
      */
-    //cout << errorBound << endl;
     if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
         return true;
     } else { 
@@ -294,13 +294,16 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     /*
      * Recursive routine for adaptive tessellation.
      */
-    //cout << "start adaptRecurse" << endl;
+    rCalls++;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
+    /*if (rCalls == 3845) {
+        cout << "first " << uvcoords[2][1] << endl;
+    }*/
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -348,6 +351,10 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         uv2.push_back(newpt1);
         uv2.push_back(uvcoords[1]);
         uv2.push_back(uvcoords[2]);
+        /*if (rCalls == 3845) {
+            cout << "second " << uvcoords[2][1] << " " << uvcoords[0][0] << endl;
+            exit(0);
+        }*/
         adaptRecurse(s, trgl1, uv1);
         adaptRecurse(s, trgl2, uv2);
         return;        
@@ -568,7 +575,6 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt1uv);
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
-    cout << "end" << endl;
 }
 
 void tessellate(Surface s) {

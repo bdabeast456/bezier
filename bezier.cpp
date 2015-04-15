@@ -158,7 +158,7 @@ void myDisplay() {
                     cout << j << endl;
                 }
             }*/
-            if(flatShading){
+            if(flatShading || tessellationStrat){
                 Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 crossP = v2.cross(v1);

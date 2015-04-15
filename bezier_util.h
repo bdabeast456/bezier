@@ -67,6 +67,7 @@ public:
 	Polygon(){};
 	Polygon(vector<vector<double> > vx, int ident);
 	vector<Vector4> vertices;
+    vector<vector<double> > normals;
 	vector<int> id; 
 };
 

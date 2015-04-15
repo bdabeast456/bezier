@@ -102,7 +102,7 @@ void initScene(){
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
-    
+
 
 }
 
@@ -136,17 +136,43 @@ void myDisplay() {
         if(tessellationStrat){
             glBegin(GL_TRIANGLES);
         }
-        else{
+        else if(!tessellationStrat){
             glBegin(GL_QUADS);
         }
         vector<Vector4> verTemp = temp->vertices;
+        int triangleCount = 0;
         for (int j= 0; j < verTemp.size(); j++) {
-            Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-            Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
-            Vector4 crossP = v2.cross(v1);
-            crossP.unit();
-            glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+            //cout << triangleCount << " " << j << endl;
+            /*if(!tessellationStrat && !flatShading && triangleCount != 0){
+                if(triangleCount == 3){
+                    cout << "here?" << endl;
+                    j-=1;
+                }
+                if(triangleCount == 5){
+                    cout << "here...????" << endl;
+                    j-=5;
+                }
+                if(triangleCount == 6){
+                    j+=5;
+                    triangleCount = 0;
+                    cout << j << endl;
+                }
+            }*/
+            if(flatShading){
+                Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+                Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+                Vector4 crossP = v2.cross(v1);
+                crossP.unit();
+                glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+                //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
+            }
+            else{
+                glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
+                //cout << temp->normals[j][0] << endl;
+            }
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
+            triangleCount +=1;
+
         }
         glEnd();
     }
@@ -173,10 +199,23 @@ void transformPolygons(matrix m){
     for(std::vector<Polygon*>::iterator poly = polygons.begin(); poly != polygons.end(); ++poly) {
         Polygon polygon = **poly;
         vector<Vector4> newVertices;
+        vector<vector<double> > newNormals;
         for(std::vector<Vector4>::iterator vert = polygon.vertices.begin(); vert != polygon.vertices.end(); ++vert){
             Vector4 vertex = *vert;
             Vector4 newVertex = m.multiplyv(vertex);
             newVertices.push_back(newVertex);
+        }
+        for(std::vector<vector<double> >::iterator normPoint = polygon.normals.begin(); normPoint != polygon.normals.end(); ++normPoint){
+            vector<double> norm = *normPoint;
+            Vector4 normalPoint = Vector4(norm[0],norm[1],norm[2],0);
+            Vector4 newNormal = m.invmult(normalPoint);
+            vector<double> newNormalVector;
+            newNormalVector.push_back(newNormal.xc());
+            newNormalVector.push_back(newNormal.yc());
+            newNormalVector.push_back(newNormal.zc());
+
+            newNormals.push_back(newNormalVector);
+
         }
         (**poly).vertices = newVertices;
 
@@ -370,12 +409,12 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         return;
     } else if (e1 && !e2 && e3) {
         /*if (rCalls == 481) {
-            for (int i=0; i<3; i++) {
-                for (int j=0; j<3; j++) {
-                    cout << (*realcoords)[i][j] << endl;
-                }
-            }
-        }*/
+          for (int i=0; i<3; i++) {
+          for (int j=0; j<3; j++) {
+          cout << (*realcoords)[i][j] << endl;
+          }
+          }
+          }*/
         vector<double> * newpt1 = new vector<double>();
         newpt1->push_back(((*uvcoords)[0][0]+(*uvcoords)[2][0])/2);
         newpt1->push_back(((*uvcoords)[0][1]+(*uvcoords)[2][1])/2);
@@ -397,8 +436,8 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         uv2->push_back((*uvcoords)[1]);
         uv2->push_back((*uvcoords)[2]);
         /*if (rCalls == 481) {
-            exit(0);
-        }*/
+          exit(0);
+          }*/
         adaptRecurse(s, trgl1, uv1);
         delete trgl1;
         delete uv1;
@@ -689,16 +728,30 @@ void tessellate(Surface s) {
         double v = (double)(vb*step);
         for (int ub=0; ub<steps; ub++) {
             double u = (double)(ub*step);
+            //cout << "start getpoints" << endl;
             vector<double> point1 = s.getSurfacePoint(u, v);
+            vector<double> normal1 = s.getSurfaceNormal(u,v);
+
             vector<double> point2 = s.getSurfacePoint(u+step, v);
+            vector<double> normal2 = s.getSurfaceNormal(u+step,v);
+
             vector<double> point3 = s.getSurfacePoint(u+step, v+step);
+            vector<double> normal3 = s.getSurfaceNormal(u+step,v+step);
+
             vector<double> point4 = s.getSurfacePoint(u, v+step);
+            vector<double> normal4 = s.getSurfaceNormal(u,v+step);
+
             vector<vector<double> > poly;
             poly.push_back(point1);
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
             Polygon* newPoly = new Polygon(poly, currID);
+
+            newPoly->normals.push_back(normal1);
+            newPoly->normals.push_back(normal2);
+            newPoly->normals.push_back(normal3);
+            newPoly->normals.push_back(normal4);
             polygons.push_back(newPoly);
         }
     }
@@ -708,43 +761,79 @@ void tessellate(Surface s) {
         for (int ub=0; ub<steps; ub++) {
             double u = (double)(ub*step);
             vector<double> point1 = s.getSurfacePoint(u, v);
+            vector<double> normal1 = s.getSurfaceNormal(u,v);
+
             vector<double> point2 = s.getSurfacePoint(u+step, v);
+            vector<double> normal2 = s.getSurfaceNormal(u+step,v);
+
             vector<double> point3 = s.getSurfacePoint(u+step, 1);
+            vector<double> normal3 = s.getSurfaceNormal(u+step,1);
+
             vector<double> point4 = s.getSurfacePoint(u, 1);
+            vector<double> normal4 = s.getSurfaceNormal(u,1);
+
             vector<vector<double> > poly;
             poly.push_back(point1);
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
             Polygon* newPoly = new Polygon(poly, currID);
+            newPoly->normals.push_back(normal1);
+            newPoly->normals.push_back(normal2);
+            newPoly->normals.push_back(normal3);
+            newPoly->normals.push_back(normal4);
             polygons.push_back(newPoly);
         }
         double u = (double)(steps*step);
         for (int vb=0; vb<steps; vb++) {
             v = (double)(vb*step);
             vector<double> point1 = s.getSurfacePoint(u, v);
+            vector<double> normal1 = s.getSurfaceNormal(u,v);
+
             vector<double> point2 = s.getSurfacePoint(1, v);
+            vector<double> normal2 = s.getSurfaceNormal(1,v);
+
             vector<double> point3 = s.getSurfacePoint(1, v+step);
+            vector<double> normal3 = s.getSurfaceNormal(1,v+step);
+
             vector<double> point4 = s.getSurfacePoint(u, v+step);
+            vector<double> normal4 = s.getSurfaceNormal(u,v+step);
+
             vector<vector<double> > poly;
             poly.push_back(point1);
             poly.push_back(point2);
             poly.push_back(point3);
             poly.push_back(point4);
             Polygon* newPoly = new Polygon(poly, currID);
+            newPoly->normals.push_back(normal1);
+            newPoly->normals.push_back(normal2);
+            newPoly->normals.push_back(normal3);
+            newPoly->normals.push_back(normal4);
             polygons.push_back(newPoly);
         }
         v = steps*step;
         vector<double> point1 = s.getSurfacePoint(u, v);
+        vector<double> normal1 = s.getSurfaceNormal(u,v);
+
         vector<double> point2 = s.getSurfacePoint(1, v);
+        vector<double> normal2 = s.getSurfaceNormal(1,v);
+
         vector<double> point3 = s.getSurfacePoint(1, 1);
+        vector<double> normal3 = s.getSurfaceNormal(1,1);
+
         vector<double> point4 = s.getSurfacePoint(u, 1);
+        vector<double> normal4 = s.getSurfaceNormal(u,1);
+
         vector<vector<double> > poly;
         poly.push_back(point1);
         poly.push_back(point2);
         poly.push_back(point3);
         poly.push_back(point4);
         Polygon* newPoly = new Polygon(poly, currID);
+        newPoly->normals.push_back(normal1);
+        newPoly->normals.push_back(normal2);
+        newPoly->normals.push_back(normal3);
+        newPoly->normals.push_back(normal4);
         polygons.push_back(newPoly);        
     }
 }
@@ -850,7 +939,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
+                //cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }

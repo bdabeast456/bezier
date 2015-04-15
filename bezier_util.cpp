@@ -136,6 +136,7 @@ Bezier::Bezier(double patch[][3]){
     patch_store.push_back(x_comp);
     patch_store.push_back(y_comp);
     patch_store.push_back(z_comp);
+    patch_store.push_back(fourth_comp);
 
 
 
@@ -209,13 +210,15 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
         {bez3.patch_store[0][0],bez3.patch_store[0][1],bez3.patch_store[0][2]},
         {bez4.patch_store[0][0],bez4.patch_store[0][1],bez4.patch_store[0][2]}};
     bez1Inv = Bezier(input1);
-
+    
     Bezier bez2Inv;
     double input2[4][3] = {{bez1.patch_store[1][0],bez1.patch_store[1][1],bez1.patch_store[1][2]},
         {bez2.patch_store[1][0],bez2.patch_store[1][1],bez2.patch_store[1][2]},
         {bez3.patch_store[1][0],bez3.patch_store[1][1],bez3.patch_store[1][2]},
         {bez4.patch_store[1][0],bez4.patch_store[1][1],bez4.patch_store[1][2]}};
     bez2Inv = Bezier(input2);
+    //cout << "got here in normal" << endl;
+
 
     Bezier bez3Inv;
     double input3[4][3] = {{bez1.patch_store[2][0],bez1.patch_store[2][1],bez1.patch_store[2][2]},
@@ -223,14 +226,16 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
         {bez3.patch_store[2][0],bez3.patch_store[2][1],bez3.patch_store[2][2]},
         {bez4.patch_store[2][0],bez4.patch_store[2][1],bez4.patch_store[2][2]}};
     bez3Inv = Bezier(input3);
-
+    //cout << "got here in normal 222222" << endl;
+    
     Bezier bez4Inv;
     double input4[4][3] = {{bez1.patch_store[3][0],bez1.patch_store[3][1],bez1.patch_store[3][2]},
         {bez2.patch_store[3][0],bez2.patch_store[3][1],bez2.patch_store[3][2]},
         {bez3.patch_store[3][0],bez3.patch_store[3][1],bez3.patch_store[3][2]},
         {bez4.patch_store[3][0],bez4.patch_store[3][1],bez4.patch_store[3][2]}};
     bez4Inv = Bezier(input4);
-
+    //cout << "not here?" << endl;
+    
     vector<double> point1u = bez1Inv.getPoint(v);
     vector<double> point2u = bez2Inv.getPoint(v);
     vector<double> point3u = bez3Inv.getPoint(v);
@@ -275,6 +280,7 @@ vector<double> Surface::getSurfaceNormal(double u, double v){
     Vector4 dpdu = Vector4(du[0],du[1],du[2],0);
     Vector4 dpdv = Vector4(dv[0],dv[1],dv[2],0);
     Vector4 uv = dpdu.cross(dpdv);
+    uv.unit();
 
     vector<double> return_value;
     return_value.push_back(uv.xc());

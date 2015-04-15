@@ -293,18 +293,20 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
     /*
      * Recursive routine for adaptive tessellation.
      */
-    //cout << "start adaptRecurse" << endl;
+    cout << "test" << endl;
+    cout << "start adaptRecurse" << endl;
+    cout << "not even now?" << endl;
     bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
             (realcoords[0][2]+realcoords[1][2])/2, s.getSurfacePoint((uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2));
-    //cout << "end e1" << endl;
+    cout << "end e1" << endl;
     //cout << "realcoord " << realcoords[2][2] << endl;
     //cout << "uvcoords " << uvcoords[2].size() << endl;
     bool e2 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
             (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
-    //cout << "end e2" << endl;
+    cout << "end e2" << endl;
     bool e3 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
             (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
-    //cout << e1 << " " << e2 << " " << e3 << endl;
+    cout << e1 << " " << e2 << " " << e3 << endl;
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(realcoords, currID);
         polygons.push_back(newPoly);
@@ -333,9 +335,11 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         adaptRecurse(s, trgl2, uv2);
         return;
     } else if (e1 && !e2 && e3) {
+        cout << "1 0 1 if statement" << endl;
         double insert1[] = {(uvcoords[0][0]+uvcoords[2][0])/2, (uvcoords[0][1]+uvcoords[2][1])/2};
         vector<double> newpoint1 = s.getSurfacePoint(insert1[0], insert1[1]);
         vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
+        //cout << "101 now" << endl;
         vector<vector<double> > trgl1;
         vector<vector<double> > uv1;    
         vector<vector<double> > trgl2;
@@ -352,10 +356,22 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         uv2.push_back(newpt1);
         uv2.push_back(uvcoords[1]);
         uv2.push_back(uvcoords[2]);
+        cout << "end of 101 before recurse" << endl;
+        //cout << "another one" << endl;
+        for(int i  = 0; i < trgl1.size(); i++){
+            for(int j = 0; j < trgl1[i].size(); j++){
+                cout << i << ", " << j << ":" <<uv2[i][j] << endl;
+            }
+        }
+        cout << "out of test for loop" << endl;
+        //cout.flush();
         adaptRecurse(s, trgl1, uv1);
+        cout << "HI" << endl;
         adaptRecurse(s, trgl2, uv2);
+        //cout << "101~~~~~~~~~~~~~~~~~~~~" << endl;
         return;        
     } else if (e1 && e2 && !e3) {
+        cout << "OH HAI!" << endl;
         double insert1[] = {(uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2};
         vector<double> newpoint1 = s.getSurfacePoint(insert1[0], insert1[1]);
         vector<double> newpt1 (insert1, insert1 + sizeof(insert1) / sizeof(double));
@@ -363,6 +379,7 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         vector<vector<double> > uv1;    
         vector<vector<double> > trgl2;
         vector<vector<double> > uv2;
+        cout << "now?" << endl;
         trgl1.push_back(newpoint1);
         trgl1.push_back(realcoords[0]);
         trgl1.push_back(realcoords[1]);
@@ -375,8 +392,11 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         uv2.push_back(newpt1);
         uv2.push_back(uvcoords[2]);
         uv2.push_back(uvcoords[0]);
+        cout << "OHAI AGAIN!" << endl;
         adaptRecurse(s, trgl1, uv1);
         adaptRecurse(s, trgl2, uv2);
+        cout << "110~~~~~~~~~~~~~~~~~~~~" << endl;
+
         return;
     } else if (!e1 && !e2 && e3) {
         double insert1[] = {(uvcoords[0][0]+uvcoords[1][0])/2, (uvcoords[0][1]+uvcoords[1][1])/2};
@@ -537,7 +557,7 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     /*
      * Starting routine for adaptive tessellation.
      */
-    //cout << "start adaptTessellate" << endl;
+    cout << "start adaptTessellate" << endl;
     vector<double> point1 = s.getSurfacePoint(u, v);
     vector<double> pt1uv;
     pt1uv.push_back(u);
@@ -571,7 +591,7 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
     uv2.push_back(pt3uv);
     uv2.push_back(pt4uv);
     uv2.push_back(pt1uv);
-    //cout << "hi2" << endl;
+    cout << "hi2" << endl;
     adaptRecurse(s, trgl1, uv1);
     adaptRecurse(s, trgl2, uv2);
 }
@@ -685,6 +705,9 @@ int main(int argc, char *argv[]) {
 
     }
     else if(argc > 3 && string(argv[3]) == "-a"){
+        if(possibleStep <= 0.02){
+            possibleStep = 0.021;
+        }
         errorBound = possibleStep;
         tessellationStrat = 1;
     }
@@ -816,23 +839,21 @@ int main(int argc, char *argv[]) {
                 tessellate(surfaces[i]);
             }
         } else {
-<<<<<<< HEAD
             cout << "ADAPTIVE TESSELLATION" << endl;
-=======
->>>>>>> 0789fec1053e5b2609ed6bd5f49bddad9ebf137a
             int steps = (int)(1/step);
+            //cout << ((surfaces[1]).bez1.cx)[0] << endl;
             for (int s=0; s<surfaces.size(); s++) {
                 for (int vb=0; vb<steps; vb++) {
                     double v = (double)(vb*step);
                     double vend = v+step;
                     for (int ub=0; ub<steps; ub++) {
                         double u = (double)(ub*step);
-                        //cout << "in the 3rd for" << endl;
+                        cout << "in the 3rd for" << endl;
                         adaptTessellate(surfaces[s], u, v, u+step, vend);
                     }
                 }
                 //Cleanup if necessary.
-                //cout << "after inner for" << endl;
+                cout << "after inner for" << endl;
                 if (1-(steps*step) > .0000001) {
                     double v = (double)(steps*step);
                     for (int ub=0; ub<steps; ub++) {
@@ -847,7 +868,7 @@ int main(int argc, char *argv[]) {
                     v = steps*step;
                     adaptTessellate(surfaces[s], u, v, 1, 1);   
                 }
-                //cout << "one outer for looped" << endl;
+               cout << "one outer for looped~~~~~~~" << endl;
             }
             //cout << "hi2" << endl;
         }

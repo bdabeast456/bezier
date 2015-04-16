@@ -141,7 +141,7 @@ void myDisplay() {
         }
         vector<Vector4> verTemp = temp->vertices;
         int triangleCount = 0;
-        for (int j= 0; j < verTemp.size(); j++) {
+        for (int j=0; j<verTemp.size(); j++) {
             //cout << triangleCount << " " << j << endl;
             /*if(!tessellationStrat && !flatShading && triangleCount != 0){
               if(triangleCount == 3){
@@ -159,15 +159,15 @@ void myDisplay() {
               }
               }*/
             if(flatShading){
-                Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-                Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+                Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+                Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 crossP = v2.cross(v1);
                 crossP.unit();
                 glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
                 //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
-                glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
+                glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
                 //cout << temp->normals[j][0] << endl;
             }
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
@@ -349,7 +349,7 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
      * Recursive routine for adaptive tessellation.
      */
     rCalls++;
-    cout << rCalls << " Here" << endl;
+    //cout << rCalls << " Here" << endl;
     bool e1 = distance(((*realcoords)[0][0]+(*realcoords)[1][0])/2, ((*realcoords)[0][1]+(*realcoords)[1][1])/2, 
             ((*realcoords)[0][2]+(*realcoords)[1][2])/2, s->getSurfacePoint(((*uvcoords)[0][0]+(*uvcoords)[1][0])/2, ((*uvcoords)[0][1]+(*uvcoords)[1][1])/2));
     bool e2 = distance(((*realcoords)[1][0]+(*realcoords)[2][0])/2, ((*realcoords)[1][1]+(*realcoords)[2][1])/2, 
@@ -367,7 +367,7 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         polygons.push_back(newPoly);
         rCalls == 0;
         return;
-    } else /*if (!e1 && e2 && e3)*/ {
+    } else if (!e1 && e2 && e3) {
         vector<double> * newpt1 = new vector<double>();
         newpt1->push_back(((*uvcoords)[0][0]+(*uvcoords)[1][0])/2);
         newpt1->push_back(((*uvcoords)[0][1]+(*uvcoords)[1][1])/2);
@@ -396,7 +396,7 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         delete uv2;
         delete newpt1;
         return;
-    } /*else if (e1 && !e2 && e3) {
+    } else if (e1 && !e2 && e3) {
         vector<double> * newpt1 = new vector<double>();
         newpt1->push_back(((*uvcoords)[0][0]+(*uvcoords)[2][0])/2);
         newpt1->push_back(((*uvcoords)[0][1]+(*uvcoords)[2][1])/2);
@@ -650,7 +650,7 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         delete newpt2; 
         delete newpt3;
         return;
-    }*/
+    }
 }
 
 void adaptTessellate(Surface s, double u, double v, double uend, double vend) {

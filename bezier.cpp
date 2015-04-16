@@ -142,22 +142,6 @@ void myDisplay() {
         vector<Vector4> verTemp = temp->vertices;
         int triangleCount = 0;
         for (int j=0; j<verTemp.size(); j++) {
-            //cout << triangleCount << " " << j << endl;
-            /*if(!tessellationStrat && !flatShading && triangleCount != 0){
-              if(triangleCount == 3){
-              cout << "here?" << endl;
-              j-=1;
-              }
-              if(triangleCount == 5){
-              cout << "here...????" << endl;
-              j-=5;
-              }
-              if(triangleCount == 6){
-              j+=5;
-              triangleCount = 0;
-              cout << j << endl;
-              }
-              }*/
             if(flatShading){
                 Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
@@ -167,8 +151,8 @@ void myDisplay() {
                 //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
-<<<<<<< HEAD
                 if(temp->normals[j][0] != temp->normals[j][0]){ // check for nan
+                    cout << "NAN!" << endl;
                     Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
                     Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
                     Vector4 crossP = v2.cross(v1);
@@ -177,11 +161,11 @@ void myDisplay() {
 
                 }
                 else{
+                    cout << "not NAN!" << endl;
                     glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
                 }
-=======
-                glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
->>>>>>> 0a281aef487fae23e06c8488b4f5a475d6e35292
+                
+                //glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
                 //cout << temp->normals[j][0] << endl;
             }
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());

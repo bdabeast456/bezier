@@ -54,13 +54,16 @@ class Surface{
         Bezier bez4;
         vector<double> getSurfacePoint(double u, double v);
         vector<double> getSurfaceNormal(double u, double v);
+        
 };
+
+vector<double> bezCurveInterp(vector<vector<double> > curve, double u, vector<double> *deriv);
 
 
 class Polygon {
 	/*
 	*  Polygon is a container class that holds the vertices of polygon (for the sake
-	*  of this project, only 4). Each polygon also maintains an int ID to keep track 
+	*  of this projet, only 4). Each polygon also maintains an int ID to keep track 
 	*  of which file it came from.
 	*/
 public:

@@ -7,6 +7,19 @@
 
 #include <iostream>
 #include "bezier_util.h"
+#include <time.h>
+#include <math.h>
+#include <iostream>
+#include <algorithm>
+#include <iostream>
+#include <iterator>
+#include <ostream>
+#include <numeric>
+#include <cstdlib>
+#include <vector>
+#include <cmath>
+#include <string.h>
+
 
 using namespace std;
 const double PI_rad = 3.141592653589793/180;
@@ -187,105 +200,100 @@ vector<double> Surface::getSurfacePoint(double u, double v){
     delete v_bez;
     return retval;
 }
+vector<double> bezCurveInterp(vector<vector<double> > curve, double u, vector<double> *deriv){
+    vector<double> A;
+    A.push_back(curve[0][0]*(1-u) + curve[1][0]*(u));
+    A.push_back(curve[0][1]*(1-u) + curve[1][1]*(u));
+    A.push_back(curve[0][2]*(1-u) + curve[1][2]*(u));
 
-vector<double> Surface::getSurfaceNormal(double u, double v){
+    vector<double> B;
+    B.push_back(curve[1][0]*(1-u) + curve[2][0]*u);
+    B.push_back(curve[1][1]*(1-u) + curve[2][1]*u);
+    B.push_back(curve[1][2]*(1-u) + curve[2][2]*u);
+
+    vector<double> C;
+    C.push_back(curve[2][0]*(1-u) + curve[3][0]*u);
+    C.push_back(curve[2][1]*(1-u) + curve[3][1]*u);
+    C.push_back(curve[2][2]*(1-u) + curve[3][2]*u);
+    //cout << "midpoint" << endl;
+
+    vector<double> D;
+    D.push_back(A[0]*(1-u)+B[0]*(u));
+    D.push_back(A[1]*(1-u)+B[1]*(u));
+    D.push_back(A[2]*(1-u)+B[2]*(u));
+
+    vector<double> E;
+    E.push_back(B[0]*(1-u) + C[0]*u);
+    E.push_back(B[1]*(1-u) + C[1]*u);
+    E.push_back(B[2]*(1-u) + C[2]*u);
+    //cout << "3/4" << endl;
+    
+    vector<double> p;
+    p.push_back(D[0]*(1-u) + E[0]*u);
+    p.push_back(D[1]*(1-u) + E[1]*u);
+    p.push_back(D[2]*(1-u) + E[2]*u);
+
+    (*deriv).push_back(3*(E[0]-D[0]));
+    (*deriv).push_back(3*(E[1]-D[1]));
+    (*deriv).push_back(3*(E[2]-D[2]));
+    
+    return p;
+
+}
+vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
     /*
      * get surface normal at point u and v
      */
-    vector<double> point1 = bez1.getPoint(u);
-    vector<double> point2 = bez2.getPoint(u);
-    vector<double> point3 = bez3.getPoint(u);
-    vector<double> point4 = bez4.getPoint(u);
-
-    double v_patch[4][3] = {{point1[0], point1[1], point1[2]},
-        {point2[0], point2[1], point2[2]},
-        {point3[0], point3[1], point3[2]},
-        {point4[0], point4[1], point4[2]}};
-    Bezier v_bez = Bezier(v_patch);
-    //vector<double> v_point = v_bez.getPoint(v);
-
-    Bezier bez1Inv;
-    double input1[4][3] = {{bez1.patch_store[0][0],bez1.patch_store[0][1],bez1.patch_store[0][2]},
-        {bez2.patch_store[0][0],bez2.patch_store[0][1],bez2.patch_store[0][2]},
-        {bez3.patch_store[0][0],bez3.patch_store[0][1],bez3.patch_store[0][2]},
-        {bez4.patch_store[0][0],bez4.patch_store[0][1],bez4.patch_store[0][2]}};
-    bez1Inv = Bezier(input1);
+    vector<vector<double> >vcurve;
+    vector<double> dpdu, dpdv, temp, point;
+    //cout << "start getSurfaceNormal" << endl;
+    vcurve.push_back(bezCurveInterp(bez1.patch_store,uInc,&temp));
+    vcurve.push_back(bezCurveInterp(bez2.patch_store,uInc,&temp));
+    vcurve.push_back(bezCurveInterp(bez3.patch_store,uInc,&temp));
+    vcurve.push_back(bezCurveInterp(bez4.patch_store,uInc,&temp));
+    //cout << "gets here in getSurfaceNormal" << endl;
+    vector<vector<double> >ucurve;
+    vector<vector<double> > c1;
+    c1.push_back(bez1.patch_store[0]);
+    c1.push_back(bez2.patch_store[0]);
+    c1.push_back(bez3.patch_store[0]);
+    c1.push_back(bez4.patch_store[0]);
     
-    Bezier bez2Inv;
-    double input2[4][3] = {{bez1.patch_store[1][0],bez1.patch_store[1][1],bez1.patch_store[1][2]},
-        {bez2.patch_store[1][0],bez2.patch_store[1][1],bez2.patch_store[1][2]},
-        {bez3.patch_store[1][0],bez3.patch_store[1][1],bez3.patch_store[1][2]},
-        {bez4.patch_store[1][0],bez4.patch_store[1][1],bez4.patch_store[1][2]}};
-    bez2Inv = Bezier(input2);
-    //cout << "got here in normal" << endl;
+    vector<vector<double> > c2;
+    c2.push_back(bez1.patch_store[1]);
+    c2.push_back(bez2.patch_store[1]);
+    c2.push_back(bez3.patch_store[1]);
+    c2.push_back(bez4.patch_store[1]);
 
+    vector<vector<double> > c3;
+    c3.push_back(bez1.patch_store[2]);
+    c3.push_back(bez2.patch_store[2]);
+    c3.push_back(bez3.patch_store[2]);
+    c3.push_back(bez4.patch_store[2]);
 
-    Bezier bez3Inv;
-    double input3[4][3] = {{bez1.patch_store[2][0],bez1.patch_store[2][1],bez1.patch_store[2][2]},
-        {bez2.patch_store[2][0],bez2.patch_store[2][1],bez2.patch_store[2][2]},
-        {bez3.patch_store[2][0],bez3.patch_store[2][1],bez3.patch_store[2][2]},
-        {bez4.patch_store[2][0],bez4.patch_store[2][1],bez4.patch_store[2][2]}};
-    bez3Inv = Bezier(input3);
-    //cout << "got here in normal 222222" << endl;
-    
-    Bezier bez4Inv;
-    double input4[4][3] = {{bez1.patch_store[3][0],bez1.patch_store[3][1],bez1.patch_store[3][2]},
-        {bez2.patch_store[3][0],bez2.patch_store[3][1],bez2.patch_store[3][2]},
-        {bez3.patch_store[3][0],bez3.patch_store[3][1],bez3.patch_store[3][2]},
-        {bez4.patch_store[3][0],bez4.patch_store[3][1],bez4.patch_store[3][2]}};
-    bez4Inv = Bezier(input4);
-    //cout << "not here?" << endl;
-    
-    vector<double> point1u = bez1Inv.getPoint(v);
-    vector<double> point2u = bez2Inv.getPoint(v);
-    vector<double> point3u = bez3Inv.getPoint(v);
-    vector<double> point4u = bez4Inv.getPoint(v);
+    vector<vector<double> > c4;
+    c4.push_back(bez1.patch_store[3]);
+    c4.push_back(bez2.patch_store[3]);
+    c4.push_back(bez3.patch_store[3]);
+    c4.push_back(bez4.patch_store[3]);
 
-    double u_patch[4][3] = {{point1u[0], point1u[1], point1u[2]},
-        {point2u[0], point2u[1], point2u[2]},
-        {point3u[0], point3u[1], point3u[2]},
-        {point4u[0], point4u[1], point4u[2]}};
+    ucurve.push_back(bezCurveInterp(c1,vInc,&temp));
+    ucurve.push_back(bezCurveInterp(c2,vInc,&temp));
+    ucurve.push_back(bezCurveInterp(c3,vInc,&temp));
+    ucurve.push_back(bezCurveInterp(c4,vInc,&temp));
 
-    Bezier u_bez = Bezier(u_patch);
-    //vector<double> u_point = u_bez.getPoint(u);
+    point = bezCurveInterp(vcurve,vInc,&dpdv);
+    point = bezCurveInterp(ucurve,uInc,&dpdu);
 
-    // V DERIVATIVE CALCULATION
-    double A[3] = {(v_bez).patch_store[0][0]*(1-v) + v_bez.patch_store[1][0]*v, 
-        v_bez.patch_store[0][1]*(1-v)+ v_bez.patch_store[1][1]*v,
-        v_bez.patch_store[0][2]*(1-v)+ v_bez.patch_store[1][2]*v};
-    double B[3] = {(v_bez).patch_store[1][0]*(1-v) + v_bez.patch_store[2][0]*v, 
-        v_bez.patch_store[1][1]*(1-v)+ v_bez.patch_store[2][1]*v,
-        v_bez.patch_store[1][2]*(1-v)+ v_bez.patch_store[2][2]*v};
-    double C[3] = {(v_bez).patch_store[2][0]*(1-v) + v_bez.patch_store[3][0]*v, 
-        v_bez.patch_store[2][1]*(1-v)+ v_bez.patch_store[3][1]*v,
-        v_bez.patch_store[2][2]*(1-v)+ v_bez.patch_store[3][2]*v};
-    double D[3] = {A[0]*(1-v) + B[0]*v, A[1]*(1-v)+B[1]*v, A[2]*(1-v)*B[2]*v};//A*(1-u) + B*u
-    double E[3] = {B[0]*(1-v) + C[0]*v, B[1]*(1-v)+C[1]*v, B[2]*(1-v)*C[2]*v}; //B*(1-u) + C*u:w
-    double dv[3]= {E[0]-D[0],E[1]-D[1],E[2]-D[2]};
-
-    //U DERIVATE CALCULATION
-    double A1[3] = {(u_bez).patch_store[0][0]*(1-u) + u_bez.patch_store[1][0]*u, 
-        u_bez.patch_store[0][1]*(1-u)+ u_bez.patch_store[1][1]*u,
-        u_bez.patch_store[0][2]*(1-u)+ u_bez.patch_store[1][2]*u};
-    double B1[3] = {(u_bez).patch_store[1][0]*(1-u) + u_bez.patch_store[2][0]*u, 
-        u_bez.patch_store[1][1]*(1-u)+ u_bez.patch_store[2][1]*u,
-        u_bez.patch_store[1][2]*(1-u)+ u_bez.patch_store[2][2]*u};
-    double C1[3] = {(u_bez).patch_store[2][0]*(1-u) + u_bez.patch_store[3][0]*u, 
-        u_bez.patch_store[2][1]*(1-u)+ u_bez.patch_store[3][1]*u,
-        u_bez.patch_store[2][2]*(1-u)+ u_bez.patch_store[3][2]*u};
-    double D1[3] = {A1[0]*(1-u) + B1[0]*u, A1[1]*(1-u)+B1[1]*u, A1[2]*(1-u)*B1[2]*u};//A*(1-u) + B*u
-    double E1[3] = {B1[0]*(1-u) + C1[0]*u, B1[1]*(1-u)+C1[1]*u, B1[2]*(1-u)*C1[2]*u}; //B*(1-u) + C*u:w
-    double du[3]= {E1[0]-D1[0],E1[1]-D1[1],E1[2]-D1[2]};
-
-    Vector4 dpdu = Vector4(du[0]*3,du[1]*3,du[2]*3,0);
-    Vector4 dpdv = Vector4(dv[0]*3,dv[1]*3,dv[2]*3,0);
-    Vector4 uv = dpdv.cross(dpdu);
-    uv.unit();
-
+    Vector4 dv = Vector4(dpdv[0],dpdv[1],dpdv[2],0);
+    Vector4 du = Vector4(dpdu[0],dpdu[1],dpdu[2],0);
+    Vector4 crossProduct = du.cross(dv);
+    crossProduct.unit();
     vector<double> return_value;
-    return_value.push_back(uv.xc());
-    return_value.push_back(uv.yc());
-    return_value.push_back(uv.zc());
+    return_value.push_back(crossProduct.xc());
+    return_value.push_back(crossProduct.yc());
+    return_value.push_back(crossProduct.zc());
+
     return return_value;
 
 }

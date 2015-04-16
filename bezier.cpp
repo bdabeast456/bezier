@@ -142,22 +142,6 @@ void myDisplay() {
         vector<Vector4> verTemp = temp->vertices;
         int triangleCount = 0;
         for (int j=0; j<verTemp.size(); j++) {
-            //cout << triangleCount << " " << j << endl;
-            /*if(!tessellationStrat && !flatShading && triangleCount != 0){
-              if(triangleCount == 3){
-              cout << "here?" << endl;
-              j-=1;
-              }
-              if(triangleCount == 5){
-              cout << "here...????" << endl;
-              j-=5;
-              }
-              if(triangleCount == 6){
-              j+=5;
-              triangleCount = 0;
-              cout << j << endl;
-              }
-              }*/
             if(flatShading){
                 Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
                 Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
@@ -167,7 +151,21 @@ void myDisplay() {
                 //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
-                glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
+                if(temp->normals[j][0] != temp->normals[j][0]){ // check for nan
+                    cout << "NAN!" << endl;
+                    Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+                    Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+                    Vector4 crossP = v2.cross(v1);
+                    crossP.unit();
+                    glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+
+                }
+                else{
+                    cout << "not NAN!" << endl;
+                    glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
+                }
+                
+                //glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
                 //cout << temp->normals[j][0] << endl;
             }
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
@@ -370,7 +368,7 @@ void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<d
         newPoly->normals.push_back(normal2);
         newPoly->normals.push_back(normal3);
         polygons.push_back(newPoly);
-        rCalls == 0;
+        rCalls = 0;
         return;
     } else if (!e1 && e2 && e3) {
         vector<double> * newpt1 = new vector<double>();

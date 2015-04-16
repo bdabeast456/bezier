@@ -61,7 +61,7 @@ vector<Surface> surfaces;
 vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step = .2;
+double step = 1;
 double errorBound;
 bool flatShading = true; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
@@ -117,8 +117,9 @@ void myReshape(int w, int h) {
     glViewport (0,0,viewport.w,viewport.h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-3, 3, -3, 3, 20, -1500);
-    //gluPerspective(60,200,-15000,-15000);
+    //glOrtho(-3, 3, -3, 3, 20, -1500);
+    //gluPerspective(90,1,-20,-1500);
+    gluPerspective(45.0f, ((float)w)/((float)h), .1f, 1500.0f);
 }
 
 //****************************************************
@@ -128,9 +129,8 @@ void myDisplay() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);               // clear the color buffer
 
     glMatrixMode(GL_MODELVIEW);                 // indicate we are specifying camera transformations
-    glLoadIdentity();                       // make sure transformation is "zero'd"
-    glScalef(zoom,zoom,zoom);
-    //glEnable(GL_LIGHTING);
+    glLoadIdentity();
+    gluLookAt(0, 0, 10+zoom, 0, 0, 0, 0, 1, 0);
     for (int i=0; i<polygons.size(); i++) {
         Polygon* temp = polygons[i];
         if(tessellationStrat){
@@ -268,8 +268,6 @@ void myKey(unsigned char key, int x, int y) {
      * General input key handling.
      */
     if(key==32) {
-        cout << rCalls << endl;
-        cout << polygons.size() << endl;
         exit(0);
     }
 
@@ -297,23 +295,11 @@ void myKey(unsigned char key, int x, int y) {
     matrix m;
     //zoom = 1;
     if(key == 43){ // '+' zoom in
-        m = matrix(0,0,-translateIncrement,0);
-        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-        curCenter = m.multiplyv(curCenter);
-        centerPoint[0] = curCenter.xc();
-        centerPoint[1] = curCenter.yc();
-        centerPoint[2] = curCenter.zc();
-        zoom += translateIncrement;
+        zoom -= translateIncrement;
 
     }
     if(key == 45){ // '-' zoom out
-        m = matrix(0,0,translateIncrement,0);
-        Vector4 curCenter = Vector4(centerPoint[0],centerPoint[1],centerPoint[2],1);
-        curCenter = m.multiplyv(curCenter);
-        centerPoint[0] = curCenter.xc();
-        centerPoint[1] = curCenter.yc();
-        centerPoint[2] = curCenter.zc();
-        zoom -= translateIncrement;
+        zoom += translateIncrement;
 
     }
     transformPolygons(m);
@@ -373,19 +359,13 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
      * Recursive routine for adaptive tessellation.
      */
     rCalls++;
+    cout << rCalls << " Here" << endl;
     bool e1 = distance(((*realcoords)[0][0]+(*realcoords)[1][0])/2, ((*realcoords)[0][1]+(*realcoords)[1][1])/2, 
             ((*realcoords)[0][2]+(*realcoords)[1][2])/2, s->getSurfacePoint(((*uvcoords)[0][0]+(*uvcoords)[1][0])/2, ((*uvcoords)[0][1]+(*uvcoords)[1][1])/2));
     bool e2 = distance(((*realcoords)[1][0]+(*realcoords)[2][0])/2, ((*realcoords)[1][1]+(*realcoords)[2][1])/2, 
             ((*realcoords)[1][2]+(*realcoords)[2][2])/2, s->getSurfacePoint(((*uvcoords)[1][0]+(*uvcoords)[2][0])/2, ((*uvcoords)[1][1]+(*uvcoords)[2][1])/2));
     bool e3 = distance(((*realcoords)[2][0]+(*realcoords)[0][0])/2, ((*realcoords)[2][1]+(*realcoords)[0][1])/2, 
             ((*realcoords)[2][2]+(*realcoords)[0][2])/2, s->getSurfacePoint(((*uvcoords)[2][0]+(*uvcoords)[0][0])/2, ((*uvcoords)[2][1]+(*uvcoords)[0][1])/2));
-    /*if (rCalls == 481) {
-      for (int i=0; i<3; i++) {
-      for (int j=0; j<3; j++) {
-      cout << (*realcoords)[i][j] << endl;
-      }
-      }
-      }*/
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(*realcoords, currID);
         vector<double> normal1 = s->getSurfaceNormal((*uvcoords)[0][0], (*uvcoords)[0][1]);
@@ -395,8 +375,9 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         newPoly->normals.push_back(normal2);
         newPoly->normals.push_back(normal3);
         polygons.push_back(newPoly);
+        rCalls = 0;
         return;
-    } else if (!e1 && e2 && e3) {
+    } else /*if (!e1 && e2 && e3)*/ {
         vector<double> * newpt1 = new vector<double>();
         newpt1->push_back(((*uvcoords)[0][0]+(*uvcoords)[1][0])/2);
         newpt1->push_back(((*uvcoords)[0][1]+(*uvcoords)[1][1])/2);
@@ -425,14 +406,7 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         delete uv2;
         delete newpt1;
         return;
-    } else if (e1 && !e2 && e3) {
-        /*if (rCalls == 481) {
-          for (int i=0; i<3; i++) {
-          for (int j=0; j<3; j++) {
-          cout << (*realcoords)[i][j] << endl;
-          }
-          }
-          }*/
+    } /*else if (e1 && !e2 && e3) {
         vector<double> * newpt1 = new vector<double>();
         newpt1->push_back(((*uvcoords)[0][0]+(*uvcoords)[2][0])/2);
         newpt1->push_back(((*uvcoords)[0][1]+(*uvcoords)[2][1])/2);
@@ -453,9 +427,6 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         uv2->push_back(*newpt1);
         uv2->push_back((*uvcoords)[1]);
         uv2->push_back((*uvcoords)[2]);
-        /*if (rCalls == 481) {
-          exit(0);
-          }*/
         adaptRecurse(s, trgl1, uv1);
         delete trgl1;
         delete uv1;
@@ -689,7 +660,7 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
         delete newpt2; 
         delete newpt3;
         return;
-    }
+    }*/
 }
 
 void adaptTessellate(Surface s, double u, double v, double uend, double vend) {

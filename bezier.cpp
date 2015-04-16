@@ -152,16 +152,16 @@ void myDisplay() {
             }
             else{
                 if(temp->normals[j][0] != temp->normals[j][0]){ // check for nan
-                    cout << "NAN!" << endl;
-                    Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-                    Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+                    //cout << "NAN!" << endl;
+                    Vector4 v1 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+                    Vector4 v2 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
                     Vector4 crossP = v2.cross(v1);
                     crossP.unit();
                     glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
-
                 }
                 else{
-                    cout << "not NAN!" << endl;
+                    glBegin(GL_QUADS);
+                    //cout << "not NAN!" << endl;
                     glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
                 }
                 

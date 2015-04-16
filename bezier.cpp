@@ -167,7 +167,17 @@ void myDisplay() {
                 //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
-                glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
+                if(temp->normals[j][0] != temp->normals[j][0]){ // check for nan
+                    Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
+                    Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
+                    Vector4 crossP = v2.cross(v1);
+                    crossP.unit();
+                    glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
+
+                }
+                else{
+                    glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
+                }
                 //cout << temp->normals[j][0] << endl;
             }
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
@@ -370,12 +380,12 @@ void adaptRecurse(Surface * s, vector<vector<double> > * realcoords, vector<vect
     bool e3 = distance(((*realcoords)[2][0]+(*realcoords)[0][0])/2, ((*realcoords)[2][1]+(*realcoords)[0][1])/2, 
             ((*realcoords)[2][2]+(*realcoords)[0][2])/2, s->getSurfacePoint(((*uvcoords)[2][0]+(*uvcoords)[0][0])/2, ((*uvcoords)[2][1]+(*uvcoords)[0][1])/2));
     /*if (rCalls == 481) {
-        for (int i=0; i<3; i++) {
-            for (int j=0; j<3; j++) {
-                cout << (*realcoords)[i][j] << endl;
-            }
-        }
-    }*/
+      for (int i=0; i<3; i++) {
+      for (int j=0; j<3; j++) {
+      cout << (*realcoords)[i][j] << endl;
+      }
+      }
+      }*/
     if (e1 && e2 && e3) {
         Polygon* newPoly = new Polygon(*realcoords, currID);
         vector<double> normal1 = s->getSurfaceNormal((*uvcoords)[0][0], (*uvcoords)[0][1]);

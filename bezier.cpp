@@ -79,10 +79,8 @@ void initScene(){
     GLfloat mat_specular[] = { 0.1, 0.1, 0.1, 1.0 };
     GLfloat mat_shininess[] = { 350 };
     GLfloat mat_amb_diff[] = { 0.1, 0.5, 0.8, 1.0 };
-    //GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glShadeModel (GL_FLAT);
-    //glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -94,9 +92,7 @@ void initScene(){
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
 
-    //glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    //glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     glEnable(GL_LIGHTING);
@@ -117,8 +113,6 @@ void myReshape(int w, int h) {
     glViewport (0,0,viewport.w,viewport.h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho(-3, 3, -3, 3, 20, -1500);
-    //gluPerspective(90,1,-20,-1500);
     gluPerspective(45.0f, ((float)w)/((float)h), .1f, 1500.0f);
 }
 
@@ -148,12 +142,9 @@ void myDisplay() {
                 Vector4 crossP = v2.cross(v1);
                 crossP.unit();
                 glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
-                //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
                 glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
-                //glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
-                //cout << temp->normals[j][0] << endl;
             }
             glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             triangleCount +=1;
@@ -268,7 +259,6 @@ void myKey(unsigned char key, int x, int y) {
 
     }
     matrix m;
-    //zoom = 1;
     if(key == 43){ // '+' zoom in
         zoom -= translateIncrement;
 
@@ -325,7 +315,6 @@ void specialKey(int key, int x, int y){
         m.multiplym(matrix(0,-rotIncrement,0,2));
         m.multiplym(matrix(-centerPoint[0],-centerPoint[1],-centerPoint[2],0));
     }
-    //findCenterPoint(currID);
     transformPolygons(m);    
 }
 
@@ -457,13 +446,11 @@ void tessellate(Surface s) {
     /*
      * Perform uniform tessellation on Surface s. Step is specified as a global variable.
      */
-    //cout << "tessellate" << endl;
     int steps = (int)(1/step);
     for (int vb=0; vb<steps; vb++) {
         double v = (double)(vb*step);
         for (int ub=0; ub<steps; ub++) {
             double u = (double)(ub*step);
-            //cout << "start getpoints" << endl;
             vector<double> point1 = s.getSurfacePoint(u, v);
             vector<double> normal1 = s.getSurfaceNormal(u,v);
 
@@ -590,8 +577,6 @@ int main(int argc, char *argv[]) {
         cout << "No input file or step size specified." << endl;
         exit(0);
     }
-    //#include <string.h>
-    //for (int i=1; i<argc; i++) {
     string arg1 = string(argv[1]);
     string arg2 = string(argv[2]);
     if(strlen(arg1.c_str()) >= 4){
@@ -612,7 +597,6 @@ int main(int argc, char *argv[]) {
     }
     else if(argc > 3 && string(argv[3]) == "-a"){
         errorBound = possibleStep;
-        cout << errorBound << " Before" << endl;
         tessellationStrat = 1;
     }
     else {
@@ -672,7 +656,6 @@ int main(int argc, char *argv[]) {
                 }
 
                 string first = string(token[0]).c_str();
-                //cout << "line, patch, second #: " << lineNumber << "," << patchNum[0] << "," << first << "END"<< endl;
                 if(lineNumber == 1){
                     numSurfaces = atof(string(token[0]).c_str());
                 }
@@ -726,7 +709,6 @@ int main(int argc, char *argv[]) {
                     if(patchNum[0] >=4){ // CALCULATE SURFACE
                         Surface sur = Surface(patchOne,patchTwo,patchThree,patchFour);
                         surfaces.push_back(sur);
-                        //curSurface.clear();
                         patchNum[0] = 0;
                     }
 
@@ -772,7 +754,6 @@ int main(int argc, char *argv[]) {
         surfaces.clear();
 
     } // end of parsing 
-    cout << "End of parsing" << endl;
     //This initializes glut
     glutInit(&argc, argv);
     //This tells glut to use a double-buffered window with red, green, and blue channels 
@@ -797,7 +778,6 @@ int main(int argc, char *argv[]) {
     glEnable(GL_DEPTH_TEST | GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
     glutMainLoop();                         // infinite loop that will keep drawing and resizing
-    // and whatever else
 
 
     return 0;

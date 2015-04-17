@@ -244,20 +244,10 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
      */
     vector<vector<double> >vcurve;
     vector<double> dpdu, dpdv, temp, point,point1;
-    //cout << "start getSurfaceNormal" << endl;
     vcurve.push_back(bezCurveInterp(bez1.patch_store,uInc,&temp));
     vcurve.push_back(bezCurveInterp(bez2.patch_store,uInc,&temp));
     vcurve.push_back(bezCurveInterp(bez3.patch_store,uInc,&temp));
     vcurve.push_back(bezCurveInterp(bez4.patch_store,uInc,&temp));
-    //cout << "gets here in getSurfaceNormal" << endl;
-    //bool checkbez1Equal = true;
-    //double lastCoord = INFINITY;
-    /*for (int i = 0; i < 4; i ++){
-      double testing = bez1.patch_store[i]
-      if (lastCoord == testing) {
-      checkbez1Equal = false;
-      }
-      }*/
 
     vector<vector<double> >ucurve;
     vector<vector<double> > c1;
@@ -294,11 +284,8 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
 
     Vector4 dv = Vector4(dpdv[0],dpdv[1],dpdv[2],0);
     Vector4 du = Vector4(dpdu[0],dpdu[1],dpdu[2],0);
-    // if dpdv or dpdu is near 0
-    //     do something on weird one
     Vector4 crossProduct = du.cross(dv);
     if(crossProduct.xc() == 0 && crossProduct.yc() == 0 && crossProduct.zc() == 0){
-        //if(du.xc() == 0 && du.yc() == 0 && du.zc() == 0){
             vector<double> dpdv1,dpdv2;
             vector<vector<double> > vcurveTest;
             vcurveTest.push_back(bezCurveInterp(bez1.patch_store,0,&temp));
@@ -315,29 +302,7 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
             point = bezCurveInterp(vcurveTest,vInc,&dpdv1);
             point1 = bezCurveInterp(vcurveTest1,vInc,&dpdv2);
 
-            /*if(point[0] != point1[0] || point[1] != point1[1] || point[2] != point1[2]){
-                cout << "DEGENERATE" << endl;
-                vector<double> newdpdv2;
-                point1 = bezCurveInterp(vcurveTest1,1-vInc,&newdpdv2);
-                newdpdv2[0] = -newdpdv2[0];
-                newdpdv2[1] = -newdpdv2[1];
-                newdpdv2[2] = -newdpdv2[2];
-
-                //dpdv2 = newdpdv2;
-                Vector4 dv1 = Vector4(dpdv1[0],dpdv1[1],dpdv1[2],0);
-                Vector4 dv2 = Vector4(newdpdv2[0],newdpdv2[1],newdpdv2[2],0);
-                Vector4 newCross = dv2.cross(dv1);
-                newCross.unit();
-                vector<double> rv;
-                rv.push_back(newCross.xc());
-                rv.push_back(newCross.yc());
-                rv.push_back(newCross.zc());
-                return rv;
-
-
-            }*/
-
-
+            
             Vector4 dv1 = Vector4(dpdv1[0],dpdv1[1],dpdv1[2],0);
             Vector4 dv2 = Vector4(dpdv2[0],dpdv2[1],dpdv2[2],0);
             Vector4 newCross = dv2.cross(dv1);
@@ -347,60 +312,7 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
             rv.push_back(newCross.yc());
             rv.push_back(newCross.zc());
             return rv;
-        //}
-        /*if(dv.xc() == 0 && dv.yc() == 0 && dv.zc() == 0){
-            vector<double> dpdu1,dpdu2;
-            vector<vector<double> > ucurveTest;
-            ucurveTest.push_back(bezCurveInterp(c1,0,&temp));
-            ucurveTest.push_back(bezCurveInterp(c2,0,&temp));
-            ucurveTest.push_back(bezCurveInterp(c3,0,&temp));
-            ucurveTest.push_back(bezCurveInterp(c4,0,&temp));
-
-            vector<vector<double> > ucurveTest1;
-            ucurveTest1.push_back(bezCurveInterp(c1,1,&temp));
-            ucurveTest1.push_back(bezCurveInterp(c2,1,&temp));
-            ucurveTest1.push_back(bezCurveInterp(c3,1,&temp));
-            ucurveTest1.push_back(bezCurveInterp(c4,1,&temp));
-
-            point = bezCurveInterp(ucurveTest,uInc,&dpdu1);
-            point1 = bezCurveInterp(ucurveTest1,uInc,&dpdu2);
-
-            //point = bezCurveInterp(ucurveTest,0,&temp);
-            if(point[0] != point1[0] || point[1] != point1[1] || point[2] != point1[2]){
-                cout << "DEGENERATE2" << endl;
-                vector<double> newdpdu1;
-                point1 = bezCurveInterp(ucurveTest,1-uInc,&newdpdu1);
-                newdpdu1[0] = -newdpdu1[0];
-                newdpdu1[1] = -newdpdu1[1];
-                newdpdu1[2] = -newdpdu1[2];
-
-                //dpdu1 = newdpdu1;
-
-                Vector4 dv1 = Vector4(newdpdu1[0],newdpdu1[1],newdpdu1[2],0);
-                Vector4 dv2 = Vector4(dpdu2[0],dpdu2[1],dpdu2[2],0);
-                Vector4 newCross = dv2.cross(dv1);
-                newCross.unit();
-                vector<double> rv;
-                rv.push_back(newCross.xc());
-                rv.push_back(newCross.yc());
-                rv.push_back(newCross.zc());
-                return rv;
-
-
-            }
-
-            Vector4 dv1 = Vector4(dpdu1[0],dpdu1[1],dpdu1[2],0);
-            Vector4 dv2 = Vector4(dpdu2[0],dpdu2[1],dpdu2[2],0);
-            Vector4 newCross = dv2.cross(dv1);
-            newCross.unit();
-            vector<double> rv;
-            rv.push_back(newCross.xc());
-            rv.push_back(newCross.yc());
-            rv.push_back(newCross.zc());
-            return rv;
-
-        }*/
-
+        
 
     }
     crossProduct.unit();

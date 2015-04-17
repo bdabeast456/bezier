@@ -215,7 +215,6 @@ vector<double> bezCurveInterp(vector<vector<double> > curve, double u, vector<do
     C.push_back(curve[2][0]*(1-u) + curve[3][0]*u);
     C.push_back(curve[2][1]*(1-u) + curve[3][1]*u);
     C.push_back(curve[2][2]*(1-u) + curve[3][2]*u);
-    //cout << "midpoint" << endl;
 
     vector<double> D;
     D.push_back(A[0]*(1-u)+B[0]*(u));
@@ -226,7 +225,6 @@ vector<double> bezCurveInterp(vector<vector<double> > curve, double u, vector<do
     E.push_back(B[0]*(1-u) + C[0]*u);
     E.push_back(B[1]*(1-u) + C[1]*u);
     E.push_back(B[2]*(1-u) + C[2]*u);
-    //cout << "3/4" << endl;
     
     vector<double> p;
     p.push_back(D[0]*(1-u) + E[0]*u);

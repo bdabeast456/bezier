@@ -61,7 +61,7 @@ vector<Surface> surfaces;
 vector<Polygon*> polygons;
 int tessellationStrat = 0;
 int currID = 0;
-double step = 1;
+double step = .5;
 double errorBound;
 bool flatShading = true; // if false, do smooth shading. if true, do flat shading
 bool wireFrame = false; // if false, do filled. if true, do wireframe
@@ -151,17 +151,7 @@ void myDisplay() {
                 //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
-                if(temp->normals[j][0] != temp->normals[j][0]){ // check for nan
-                    Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-                    Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
-                    Vector4 crossP = v2.cross(v1);
-                    crossP.unit();
-                    glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
-                }
-                else{
-                    glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
-                }
-                
+                glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
                 //glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
                 //cout << temp->normals[j][0] << endl;
             }
@@ -180,7 +170,7 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
      * Tells if errorBound is larger than the distance between points.
      */
-    if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
+    if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2], 2), .5)) { 
         return true;
     } else { 
         return false;
@@ -339,318 +329,107 @@ void specialKey(int key, int x, int y){
     transformPolygons(m);    
 }
 
-void adaptRecurse(Surface s, vector<vector<double> > realcoords, vector<vector<double> > uvcoords) {
+void adaptRecurse(Surface s, vector<double> p0, vector<double> p1, vector<double> p2) {
     /*
      * Recursive routine for adaptive tessellation.
      */
-    bool e1 = distance((realcoords[0][0]+realcoords[1][0])/2, (realcoords[0][1]+realcoords[1][1])/2, 
-            (realcoords[0][2]+
-                realcoords[1][2])/2, 
-            s.getSurfacePoint(
-                (uvcoords[0][0]+
-                uvcoords[1][0])/2, 
-            (uvcoords[0][1]+
-                uvcoords[1][1])/2));
-    bool e3 = distance((realcoords[1][0]+realcoords[2][0])/2, (realcoords[1][1]+realcoords[2][1])/2, 
-            (realcoords[1][2]+realcoords[2][2])/2, s.getSurfacePoint((uvcoords[1][0]+uvcoords[2][0])/2, (uvcoords[1][1]+uvcoords[2][1])/2));
-    bool e2 = distance((realcoords[2][0]+realcoords[0][0])/2, (realcoords[2][1]+realcoords[0][1])/2, 
-            (realcoords[2][2]+realcoords[0][2])/2, s.getSurfacePoint((uvcoords[2][0]+uvcoords[0][0])/2, (uvcoords[2][1]+uvcoords[0][1])/2));
-    if (e1 && e2 && e3) {
-        Polygon* newPoly = new Polygon(realcoords, currID);
-        vector<double> normal1 = s.getSurfaceNormal(uvcoords[0][0], uvcoords[0][1]);
-        vector<double> normal2 = s.getSurfaceNormal(uvcoords[1][0], uvcoords[1][1]);
-        vector<double> normal3 = s.getSurfaceNormal(uvcoords[2][0], uvcoords[2][1]);
-        newPoly->normals.push_back(normal1);
-        newPoly->normals.push_back(normal2);
-        newPoly->normals.push_back(normal3);
+    bool e1 = distance((p0[0]+p1[0])/2, (p0[1]+p1[1])/2, (p0[2]+p1[2])/2, s.getSurfacePoint((p0[3]+p1[3])/2, (p0[4]+p1[4])/2));
+    bool e2 = distance((p2[0]+p1[0])/2, (p2[1]+p1[1])/2, (p2[2]+p1[2])/2, s.getSurfacePoint((p2[3]+p1[3])/2, (p2[4]+p1[4])/2));
+    bool e3 = distance((p2[0]+p0[0])/2, (p2[1]+p0[1])/2, (p2[2]+p0[2])/2, s.getSurfacePoint((p2[3]+p0[3])/2, (p2[4]+p0[4])/2));
+    if (e3 && e2 && e1) {
+        vector<double> * temp1 = new vector<double>();
+        vector<double> * temp2 = new vector<double>();
+        vector<double> * temp3 = new vector<double>();
+        for (int i=0; i<3; i++) {
+            temp1->push_back(p2[i]);
+            temp2->push_back(p1[i]);
+            temp3->push_back(p0[i]);
+        }
+        vector<vector<double> > * poly = new vector<vector<double> >();
+        poly->push_back(*temp1);
+        poly->push_back(*temp2);
+        poly->push_back(*temp3);
+        Polygon * newPoly = new Polygon(*poly, currID);
+        newPoly->normals.push_back(s.getSurfaceNormal(p2[3], p2[4]));
+        newPoly->normals.push_back(s.getSurfaceNormal(p1[3], p1[4]));
+        newPoly->normals.push_back(s.getSurfaceNormal(p0[3], p0[4]));
         polygons.push_back(newPoly);
-        rCalls = 0;
+        delete temp1;
+        delete temp2;
+        delete temp3;
+        delete poly;
         return;
-    } else if (!e1 && e2 && e3) {
-        vector<double> * newpt1 = new vector<double>();
-        newpt1->push_back((uvcoords[0][0]+uvcoords[1][0])/2);
-        newpt1->push_back((uvcoords[0][1]+uvcoords[1][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(realcoords[2]);
-        trgl1->push_back(realcoords[0]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(uvcoords[2]);
-        uv1->push_back(uvcoords[0]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(realcoords[1]);
-        trgl2->push_back(realcoords[2]);
-        uv2->push_back(*newpt1);
-        uv2->push_back(uvcoords[1]);
-        uv2->push_back(uvcoords[2]);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        delete newpt1;
+    } else if (e3 && e2 && !e1) {
+        vector<double> temp1 = s.getSurfacePoint((p0[3]+p1[3])/2, (p0[4]+p1[4])/2);
+        temp1.push_back((p0[3]+p1[3])/2);
+        temp1.push_back((p0[4]+p1[4])/2);
+        adaptRecurse(s, temp1, p1, p2);
+        adaptRecurse(s, temp1, p2, p0);
         return;
-    } else if (e1 && !e2 && e3) {
-        rCalls++;
-        vector<double> * newpt1 = new vector<double>();
-        newpt1->push_back((uvcoords[0][0]+uvcoords[2][0])/2);
-        newpt1->push_back((uvcoords[0][1]+uvcoords[2][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(realcoords[0]);
-        trgl1->push_back(realcoords[1]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(uvcoords[0]);
-        uv1->push_back(uvcoords[1]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(realcoords[1]);
-        trgl2->push_back(realcoords[2]);
-        uv2->push_back(*newpt1);
-        uv2->push_back(uvcoords[1]);
-        uv2->push_back(uvcoords[2]);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        delete newpt1;
-        return;        
-    } else if (e1 && e2 && !e3) {
-        vector<double> * newpt1 = new vector<double>();
-        newpt1->push_back((uvcoords[1][0]+uvcoords[2][0])/2);
-        newpt1->push_back((uvcoords[1][1]+uvcoords[2][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(realcoords[0]);
-        trgl1->push_back(realcoords[1]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(uvcoords[0]);
-        uv1->push_back(uvcoords[1]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(realcoords[2]);
-        trgl2->push_back(realcoords[0]);
-        uv2->push_back(*newpt1);
-        uv2->push_back(uvcoords[2]);
-        uv2->push_back(uvcoords[0]);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        delete newpt1;
-        return;  
-    } else if (!e1 && !e2 && e3) {
-        vector<double> * newpt1 = new vector<double>();
-        vector<double> * newpt2 = new vector<double>();
-        newpt1->push_back((uvcoords[0][0]+uvcoords[1][0])/2);
-        newpt1->push_back((uvcoords[0][1]+uvcoords[1][1])/2);
-        newpt2->push_back((uvcoords[2][0]+uvcoords[0][0])/2);
-        newpt2->push_back((uvcoords[2][1]+uvcoords[0][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<double> newpoint2 = s.getSurfacePoint((*newpt2)[0], (*newpt2)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        vector<vector<double> > * trgl3 = new vector<vector<double> >();
-        vector<vector<double> > * uv3 = new vector<vector<double> >(); 
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(newpoint2);
-        trgl1->push_back(realcoords[0]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(*newpt2);
-        uv1->push_back(uvcoords[0]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(realcoords[1]);
-        trgl2->push_back(newpoint2);
-        uv2->push_back(*newpt1);
-        uv2->push_back(uvcoords[1]);
-        uv2->push_back(*newpt2);
-        trgl3->push_back(newpoint2);
-        trgl3->push_back(realcoords[1]);
-        trgl3->push_back(realcoords[2]);
-        uv3->push_back(*newpt2);
-        uv3->push_back(uvcoords[1]);
-        uv3->push_back(uvcoords[2]);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        adaptRecurse(s, *trgl3, *uv3);
-        delete trgl3;
-        delete uv3;
-        delete newpt1;
-        delete newpt2;
+    } else if (e3 && !e2 && e1) {
+        vector<double> temp1 = s.getSurfacePoint((p2[3]+p1[3])/2, (p2[4]+p1[4])/2);
+        temp1.push_back((p2[3]+p1[3])/2);
+        temp1.push_back((p2[4]+p1[4])/2);
+        adaptRecurse(s, temp1, p0, p1);
+        adaptRecurse(s, temp1, p2, p0);
         return;
-    } else if (e1 && !e2 && !e3) {
-        vector<double> * newpt1 = new vector<double>();
-        vector<double> * newpt2 = new vector<double>();
-        newpt1->push_back((uvcoords[1][0]+uvcoords[2][0])/2);
-        newpt1->push_back((uvcoords[1][1]+uvcoords[2][1])/2);
-        newpt2->push_back((uvcoords[2][0]+uvcoords[0][0])/2);
-        newpt2->push_back((uvcoords[2][1]+uvcoords[0][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<double> newpoint2 = s.getSurfacePoint((*newpt2)[0], (*newpt2)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        vector<vector<double> > * trgl3 = new vector<vector<double> >();
-        vector<vector<double> > * uv3 = new vector<vector<double> >(); 
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(realcoords[0]);
-        trgl1->push_back(realcoords[1]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(uvcoords[0]);
-        uv1->push_back(uvcoords[1]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(newpoint2);
-        trgl2->push_back(realcoords[0]);
-        uv2->push_back(*newpt1);
-        uv2->push_back(*newpt2);
-        uv2->push_back(uvcoords[0]);
-        trgl3->push_back(newpoint1);
-        trgl3->push_back(realcoords[2]);
-        trgl3->push_back(newpoint2);
-        uv3->push_back(*newpt1);
-        uv3->push_back(uvcoords[2]);
-        uv3->push_back(*newpt2);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        adaptRecurse(s, *trgl3, *uv3);
-        delete trgl3;
-        delete uv3;
-        delete newpt1;
-        delete newpt2;
+    } else if (!e3 && e2 && e1) {
+        vector<double> temp1 = s.getSurfacePoint((p2[3]+p0[3])/2, (p2[4]+p0[4])/2);
+        temp1.push_back((p2[3]+p0[3])/2);
+        temp1.push_back((p2[4]+p0[4])/2);
+        adaptRecurse(s, temp1, p0, p1);
+        adaptRecurse(s, temp1, p1, p2);
         return;
-    } else if (!e1 && e2 && !e3) {
-        vector<double> * newpt1 = new vector<double>();
-        vector<double> * newpt2 = new vector<double>();
-        newpt1->push_back((uvcoords[0][0]+uvcoords[1][0])/2);
-        newpt1->push_back((uvcoords[0][1]+uvcoords[1][1])/2);
-        newpt2->push_back((uvcoords[1][0]+uvcoords[2][0])/2);
-        newpt2->push_back((uvcoords[1][1]+uvcoords[2][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<double> newpoint2 = s.getSurfacePoint((*newpt2)[0], (*newpt2)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        vector<vector<double> > * trgl3 = new vector<vector<double> >();
-        vector<vector<double> > * uv3 = new vector<vector<double> >();
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(realcoords[2]);
-        trgl1->push_back(realcoords[0]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(uvcoords[2]);
-        uv1->push_back(uvcoords[0]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(realcoords[1]);
-        trgl2->push_back(newpoint2);
-        uv2->push_back(*newpt1);
-        uv2->push_back(uvcoords[1]);
-        uv2->push_back(*newpt2);
-        trgl3->push_back(newpoint2);
-        trgl3->push_back(realcoords[2]);
-        trgl3->push_back(newpoint1);
-        uv3->push_back(*newpt2);
-        uv3->push_back(uvcoords[2]);
-        uv3->push_back(*newpt1);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        adaptRecurse(s, *trgl3, *uv3);
-        delete trgl3;
-        delete uv3;
-        delete newpt1;
-        delete newpt2;
+    } else if (e3 && !e2 && !e1) {
+        vector<double> temp1 = s.getSurfacePoint((p0[3]+p1[3])/2, (p0[4]+p1[4])/2);
+        vector<double> temp2 = s.getSurfacePoint((p2[3]+p1[3])/2, (p2[4]+p1[4])/2);
+        temp1.push_back((p0[3]+p1[3])/2);
+        temp1.push_back((p0[4]+p1[4])/2);
+        temp2.push_back((p2[3]+p1[3])/2);
+        temp2.push_back((p2[4]+p1[4])/2);
+        adaptRecurse(s, temp1, p1, temp2);
+        adaptRecurse(s, temp1, temp2, p0);
+        adaptRecurse(s, temp2, p2, p0);
         return;
-
+    } else if (!e3 && !e2 && e1) { //keep eye
+        vector<double> temp1 = s.getSurfacePoint((p2[3]+p1[3])/2, (p2[4]+p1[4])/2);
+        vector<double> temp2 = s.getSurfacePoint((p2[3]+p0[3])/2, (p2[4]+p0[4])/2);
+        temp1.push_back((p2[3]+p1[3])/2);
+        temp1.push_back((p2[4]+p1[4])/2);
+        temp2.push_back((p2[3]+p0[3])/2);
+        temp2.push_back((p2[4]+p0[4])/2);
+        adaptRecurse(s, temp2, p0, p1);
+        adaptRecurse(s, temp1, temp2, p1);
+        adaptRecurse(s, temp1, p2, temp2);
+        return;
+    } else if (!e3 && e2 && !e1) { //keep eye
+        vector<double> temp1 = s.getSurfacePoint((p0[3]+p1[3])/2, (p0[4]+p1[4])/2);
+        vector<double> temp2 = s.getSurfacePoint((p2[3]+p0[3])/2, (p2[4]+p0[4])/2);
+        temp1.push_back((p0[3]+p1[3])/2);
+        temp1.push_back((p0[4]+p1[4])/2);
+        temp2.push_back((p2[3]+p0[3])/2);
+        temp2.push_back((p2[4]+p0[4])/2);
+        adaptRecurse(s, temp1, p1, p2);
+        adaptRecurse(s, temp1, temp2, p0);
+        adaptRecurse(s, temp1, p2, temp2);
+        return;
     } else {
-        vector<double> * newpt1 = new vector<double>();
-        vector<double> * newpt2 = new vector<double>();
-        vector<double> * newpt3 = new vector<double>();
-        newpt1->push_back((uvcoords[0][0]+uvcoords[1][0])/2);
-        newpt1->push_back((uvcoords[0][1]+uvcoords[1][1])/2);
-        newpt2->push_back((uvcoords[1][0]+uvcoords[2][0])/2);
-        newpt2->push_back((uvcoords[1][1]+uvcoords[2][1])/2);
-        newpt3->push_back((uvcoords[2][0]+uvcoords[0][0])/2);
-        newpt3->push_back((uvcoords[2][1]+uvcoords[0][1])/2);
-        vector<double> newpoint1 = s.getSurfacePoint((*newpt1)[0], (*newpt1)[1]);
-        vector<double> newpoint2 = s.getSurfacePoint((*newpt2)[0], (*newpt2)[1]);
-        vector<double> newpoint3 = s.getSurfacePoint((*newpt3)[0], (*newpt3)[1]);
-        vector<vector<double> > * trgl1 = new vector<vector<double> >();
-        vector<vector<double> > * uv1 = new vector<vector<double> >();    
-        vector<vector<double> > * trgl2 = new vector<vector<double> >();
-        vector<vector<double> > * uv2 = new vector<vector<double> >();
-        vector<vector<double> > * trgl3 = new vector<vector<double> >();
-        vector<vector<double> > * uv3 = new vector<vector<double> >();
-        vector<vector<double> > * trgl4 = new vector<vector<double> >();
-        vector<vector<double> > * uv4 = new vector<vector<double> >();        
-        trgl1->push_back(newpoint1);
-        trgl1->push_back(newpoint3);
-        trgl1->push_back(realcoords[0]);
-        uv1->push_back(*newpt1);
-        uv1->push_back(*newpt3);
-        uv1->push_back(uvcoords[0]);
-        trgl2->push_back(newpoint1);
-        trgl2->push_back(newpoint2);
-        trgl2->push_back(newpoint3);
-        uv2->push_back(*newpt1);
-        uv2->push_back(*newpt2);
-        uv2->push_back(*newpt3);
-        trgl3->push_back(newpoint1);
-        trgl3->push_back(realcoords[1]);
-        trgl3->push_back(newpoint2);
-        uv3->push_back(*newpt1);
-        uv3->push_back(uvcoords[1]);
-        uv3->push_back(*newpt2);
-        trgl4->push_back(newpoint2);
-        trgl4->push_back(realcoords[2]);
-        trgl4->push_back(newpoint3);
-        uv4->push_back(*newpt2);
-        uv4->push_back(uvcoords[2]);
-        uv4->push_back(*newpt3);
-        adaptRecurse(s, *trgl1, *uv1);
-        delete trgl1;
-        delete uv1;
-        adaptRecurse(s, *trgl2, *uv2);
-        delete trgl2;
-        delete uv2;
-        adaptRecurse(s, *trgl3, *uv3);
-        delete trgl3;
-        delete uv3;
-        adaptRecurse(s, *trgl4, *uv4);
-        delete trgl4;
-        delete uv4;
-        delete newpt1;
-        delete newpt2;
-        return;
+        vector<double> temp1 = s.getSurfacePoint((p0[3]+p1[3])/2, (p0[4]+p1[4])/2);
+        vector<double> temp2 = s.getSurfacePoint((p2[3]+p1[3])/2, (p2[4]+p1[4])/2);
+        vector<double> temp3 = s.getSurfacePoint((p2[3]+p0[3])/2, (p2[4]+p0[4])/2);
+        temp1.push_back((p0[3]+p1[3])/2);
+        temp1.push_back((p0[4]+p1[4])/2);
+        temp2.push_back((p2[3]+p1[3])/2);
+        temp2.push_back((p2[4]+p1[4])/2);
+        temp3.push_back((p2[3]+p0[3])/2);
+        temp3.push_back((p2[4]+p0[4])/2);
+        adaptRecurse(s, temp1, p1, temp2);
+        adaptRecurse(s, temp1, temp2, temp3);
+        adaptRecurse(s, temp1, temp3, p0);
+        adaptRecurse(s, temp2, p2, temp3);
+        return;                
     }
+
 }
 
 void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
@@ -658,43 +437,19 @@ void adaptTessellate(Surface s, double u, double v, double uend, double vend) {
      * Starting routine for adaptive tessellation.
      */
     vector<double> point1 = s.getSurfacePoint(u, v);
-    vector<double> pt1uv;
-    pt1uv.push_back(u);
-    pt1uv.push_back(v);
     vector<double> point2 = s.getSurfacePoint(uend, v);
-    vector<double> pt2uv;
-    pt2uv.push_back(uend);
-    pt2uv.push_back(v);
     vector<double> point3 = s.getSurfacePoint(uend, vend);
-    vector<double> pt3uv;
-    pt3uv.push_back(uend);
-    pt3uv.push_back(vend);
     vector<double> point4 = s.getSurfacePoint(u, vend);
-    vector<double> pt4uv;
-    pt4uv.push_back(u);
-    pt4uv.push_back(vend);
-    vector<vector<double> > * trgl1 = new vector<vector<double> >();
-    vector<vector<double> > * uv1 = new vector<vector<double> >();
-    vector<vector<double> > * trgl2 = new vector<vector<double> >();
-    vector<vector<double> > * uv2 = new vector<vector<double> >();
-    trgl1->push_back(point1);
-    trgl1->push_back(point2);
-    trgl1->push_back(point3);
-    uv1->push_back(pt1uv);
-    uv1->push_back(pt2uv);
-    uv1->push_back(pt3uv);
-    trgl2->push_back(point3);
-    trgl2->push_back(point4);
-    trgl2->push_back(point1);
-    uv2->push_back(pt3uv);
-    uv2->push_back(pt4uv);
-    uv2->push_back(pt1uv);
-    adaptRecurse(s, *trgl1, *uv1);
-    delete trgl1;
-    delete uv1;
-    adaptRecurse(s, *trgl2, *uv2);
-    delete trgl2;
-    delete uv2;
+    point1.push_back(u);
+    point1.push_back(v);
+    point2.push_back(uend);
+    point2.push_back(v);
+    point3.push_back(uend);
+    point3.push_back(vend);
+    point4.push_back(u);
+    point4.push_back(vend);
+    adaptRecurse(s, point1, point3, point2);
+    adaptRecurse(s, point1, point4, point3);
     return;
 }
 
@@ -736,7 +491,7 @@ void tessellate(Surface s) {
         }
     }
     //Cleanup if necessary.
-    if (1-(steps*step) > .0000001) {
+    if (1-(steps*step) > .0000000000001) {
         double v = (double)(steps*step);
         for (int ub=0; ub<steps; ub++) {
             double u = (double)(ub*step);
@@ -856,10 +611,8 @@ int main(int argc, char *argv[]) {
 
     }
     else if(argc > 3 && string(argv[3]) == "-a"){
-        if(possibleStep <= 0.02){
-            possibleStep = 0.021;
-        }
         errorBound = possibleStep;
+        cout << errorBound << " Before" << endl;
         tessellationStrat = 1;
     }
     else {
@@ -999,7 +752,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 //Cleanup if necessary.
-                if (1-(steps*step) > .0000001) {
+                if (1-(steps*step) > .0000000000001) {
                     double v = (double)(steps*step);
                     for (int ub=0; ub<steps; ub++) {
                         double u = (double)(ub*step);

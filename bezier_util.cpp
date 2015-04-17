@@ -243,7 +243,7 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
      * get surface normal at point u and v
      */
     vector<vector<double> >vcurve;
-    vector<double> dpdu, dpdv, temp, point;
+    vector<double> dpdu, dpdv, temp, point,point1;
     //cout << "start getSurfaceNormal" << endl;
     vcurve.push_back(bezCurveInterp(bez1.patch_store,uInc,&temp));
     vcurve.push_back(bezCurveInterp(bez2.patch_store,uInc,&temp));
@@ -313,7 +313,16 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
             vcurveTest1.push_back(bezCurveInterp(bez4.patch_store,1,&temp));
 
             point = bezCurveInterp(vcurveTest,vInc,&dpdv1);
-            point = bezCurveInterp(vcurveTest1,vInc,&dpdv2);
+            point1 = bezCurveInterp(vcurveTest1,vInc,&dpdv2);
+
+            if(point[0] != point1[0] || point[1] != point1[1] || point[2] != point1[2]){
+
+                vector<double> newdpdv2;
+                point1 = bezCurveInterp(vcurveTest1,1-vInc,&newdpdv2);
+                dpdv2 = newdpdv2;
+
+            }
+
 
             Vector4 dv1 = Vector4(dpdv1[0],dpdv1[1],dpdv1[2],0);
             Vector4 dv2 = Vector4(dpdv2[0],dpdv2[1],dpdv2[2],0);
@@ -340,7 +349,16 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
             ucurveTest1.push_back(bezCurveInterp(c4,1,&temp));
 
             point = bezCurveInterp(ucurveTest,uInc,&dpdu1);
-            point = bezCurveInterp(ucurveTest1,uInc,&dpdu2);
+            point1 = bezCurveInterp(ucurveTest1,uInc,&dpdu2);
+
+            //point = bezCurveInterp(ucurveTest,0,&temp);
+            if(point[0] != point1[0] || point[1] != point1[1] || point[2] != point1[2]){
+
+                vector<double> newdpdu1;
+                point1 = bezCurveInterp(ucurveTest,1-uInc,&newdpdu1);
+                dpdu1 = newdpdu1;
+
+            }
 
             Vector4 dv1 = Vector4(dpdu1[0],dpdu1[1],dpdu1[2],0);
             Vector4 dv2 = Vector4(dpdu2[0],dpdu2[1],dpdu2[2],0);
@@ -351,6 +369,7 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
             rv.push_back(newCross.yc());
             rv.push_back(newCross.zc());
             return rv;
+            
         }
 
 

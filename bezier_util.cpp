@@ -319,6 +319,11 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
 
                 vector<double> newdpdv2;
                 point1 = bezCurveInterp(vcurveTest1,1-vInc,&newdpdv2);
+                newdpdv2[0] = -newdpdv2[0];
+                newdpdv2[1] = -newdpdv2[1];
+                newdpdv2[2] = -newdpdv2[2];
+
+
                 dpdv2 = newdpdv2;
 
             }
@@ -356,6 +361,10 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
 
                 vector<double> newdpdu1;
                 point1 = bezCurveInterp(ucurveTest,1-uInc,&newdpdu1);
+                newdpdu1[0] = -newdpdu1[0];
+                newdpdu1[1] = -newdpdu1[1];
+                newdpdu1[2] = -newdpdu1[2];
+
                 dpdu1 = newdpdu1;
 
             }

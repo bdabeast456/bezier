@@ -151,18 +151,7 @@ void myDisplay() {
                 //glVertex3f(verTemp[j].xc(), verTemp[j].yc(), verTemp[j].zc());
             }
             else{
-                if(temp->normals[j][0] != temp->normals[j][0]){ // check for nan
-                    Vector4 v2 = verTemp[(j-1) % verTemp.size()].sub(verTemp[j]);
-                    Vector4 v1 = verTemp[(j+1) % verTemp.size()].sub(verTemp[j]);
-                    Vector4 crossP = v2.cross(v1);
-                    crossP.unit();
-                    glNormal3f(crossP.xc(), crossP.yc(), crossP.zc());
-
-                }
-                else{
-                    glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
-                }
-                
+                glNormal3f(temp->normals[j][0],temp->normals[j][1],temp->normals[j][2]);
                 //glNormal3f(-(temp->normals[j][0]),-(temp->normals[j][1]),-(temp->normals[j][2]));
                 //cout << temp->normals[j][0] << endl;
             }
@@ -181,7 +170,7 @@ bool distance(double x1, double y1, double z1, vector<double> coords) {
     /*
      * Tells if errorBound is larger than the distance between points.
      */
-    if (errorBound > sqrt(sqr(x1-coords[0])+sqr(y1-coords[1])+sqr(z1-coords[2]))) { 
+    if (errorBound > pow(pow(x1-coords[0], 2)+pow(y1-coords[1], 2)+pow(z1-coords[2], 2), .5)) { 
         return true;
     } else { 
         return false;
@@ -502,7 +491,7 @@ void tessellate(Surface s) {
         }
     }
     //Cleanup if necessary.
-    if (1-(steps*step) > .0000001) {
+    if (1-(steps*step) > .0000000000001) {
         double v = (double)(steps*step);
         for (int ub=0; ub<steps; ub++) {
             double u = (double)(ub*step);
@@ -622,10 +611,8 @@ int main(int argc, char *argv[]) {
 
     }
     else if(argc > 3 && string(argv[3]) == "-a"){
-        if(possibleStep <= 0.02){
-            possibleStep = 0.021;
-        }
         errorBound = possibleStep;
+        cout << errorBound << " Before" << endl;
         tessellationStrat = 1;
     }
     else {
@@ -765,7 +752,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 //Cleanup if necessary.
-                if (1-(steps*step) > .0000001) {
+                if (1-(steps*step) > .0000000000001) {
                     double v = (double)(steps*step);
                     for (int ub=0; ub<steps; ub++) {
                         double u = (double)(ub*step);

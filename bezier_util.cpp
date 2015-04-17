@@ -23,7 +23,7 @@
 
 using namespace std;
 const double PI_rad = 3.141592653589793/180;
-
+const double nearzero = 0.00000000000000000000000000001;
 Vector4::Vector4() {
     /*
      * Constructs the 0 Vector4.
@@ -250,6 +250,15 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
     vcurve.push_back(bezCurveInterp(bez3.patch_store,uInc,&temp));
     vcurve.push_back(bezCurveInterp(bez4.patch_store,uInc,&temp));
     //cout << "gets here in getSurfaceNormal" << endl;
+    //bool checkbez1Equal = true;
+    //double lastCoord = INFINITY;
+    /*for (int i = 0; i < 4; i ++){
+        double testing = bez1.patch_store[i]
+        if (lastCoord == testing) {
+            checkbez1Equal = false;
+        }
+    }*/
+
     vector<vector<double> >ucurve;
     vector<vector<double> > c1;
     c1.push_back(bez1.patch_store[0]);
@@ -285,7 +294,37 @@ vector<double> Surface::getSurfaceNormal(double uInc, double vInc){
 
     Vector4 dv = Vector4(dpdv[0],dpdv[1],dpdv[2],0);
     Vector4 du = Vector4(dpdu[0],dpdu[1],dpdu[2],0);
+    // if dpdv or dpdu is near 0
+    //     do something on weird one
     Vector4 crossProduct = du.cross(dv);
+    if(crossProduct.xc() == 0 && crossProduct.yc() == 0 && crossProduct.zc() == 0){
+        vector<double> dpdv1,dpdv2;
+        vector<vector<double> > vcurveTest;
+        vcurveTest.push_back(bezCurveInterp(bez1.patch_store,0,&temp));
+        vcurveTest.push_back(bezCurveInterp(bez2.patch_store,0,&temp));
+        vcurveTest.push_back(bezCurveInterp(bez3.patch_store,0,&temp));
+        vcurveTest.push_back(bezCurveInterp(bez4.patch_store,0,&temp));
+
+        vector<vector<double> > vcurveTest1;
+        vcurveTest1.push_back(bezCurveInterp(bez1.patch_store,1,&temp));
+        vcurveTest1.push_back(bezCurveInterp(bez2.patch_store,1,&temp));
+        vcurveTest1.push_back(bezCurveInterp(bez3.patch_store,1,&temp));
+        vcurveTest1.push_back(bezCurveInterp(bez4.patch_store,1,&temp));
+
+        point = bezCurveInterp(vcurveTest,vInc,&dpdv1);
+        point = bezCurveInterp(vcurveTest1,vInc,&dpdv2);
+
+        Vector4 dv1 = Vector4(dpdv1[0],dpdv1[1],dpdv1[2],0);
+        Vector4 dv2 = Vector4(dpdv2[0],dpdv2[1],dpdv2[2],0);
+        Vector4 newCross = dv2.cross(dv1);
+        newCross.unit();
+        vector<double> rv;
+        rv.push_back(newCross.xc());
+        rv.push_back(newCross.yc());
+        rv.push_back(newCross.zc());
+        return rv;
+
+    }
     crossProduct.unit();
     vector<double> return_value;
     return_value.push_back(crossProduct.xc());
